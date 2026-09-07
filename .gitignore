@@ -1,0 +1,30 @@
+# Gradle and Minecraft generated files
+**/.gradle/
+**/build/
+**/runs/
+**/logs/
+**/crash-reports/
+**/debug/
+
+# IDE and local machine files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+*.user
+*.userprefs
+*.suo
+*.swp
+
+# Java crash and temporary files
+hs_err_pid*.log
+replay_pid*.log
+*.tmp
+*.part
+
+# Local test and tool output
+_smoke-cache/
+smoke-*.txt
+
+# Keep versioned dependency JARs under each project's libs/ directory.

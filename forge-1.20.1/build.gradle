@@ -1,0 +1,82 @@
+plugins {
+    id "java"
+    id "architectury-plugin" version "3.4-SNAPSHOT"
+    id "dev.architectury.loom" version "1.3-SNAPSHOT"
+}
+
+architectury {
+    minecraft = project.minecraft_version
+    injectInjectables = false
+}
+
+group = project.maven_group
+version = project.mod_version
+base.archivesName = project.archives_base_name
+
+repositories {
+    mavenCentral()
+    maven { url = "https://maven.architectury.dev/" }
+    maven { url = "https://maven.fabricmc.net/" }
+    maven { url = "https://maven.minecraftforge.net/" }
+    maven { url = "https://maven.ftb.dev/releases" }
+}
+
+def dependencyFiles = fileTree("libs") {
+    include "*.jar"
+    exclude "item-filters-forge-2001.1.0-build.53.jar"
+}.files
+loom {
+    silentMojangMappingsLicense()
+    forge {
+        mixinConfigs = ["ftbquestskubejs.mixins.json"]
+    }
+    runs {
+        client {
+            runDir = "runs/client"
+        }
+        server {
+            runDir = "runs/server"
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.layered {
+        officialMojangMappings()
+    }
+    forge "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
+
+    modImplementation "dev.architectury:architectury-forge:${project.architectury_version}"
+    modImplementation files(dependencyFiles)
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.release = 17
+}
+
+processResources {
+    inputs.property "version", project.version
+    filesMatching("META-INF/mods.toml") {
+        expand version: project.version
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+                "Specification-Title": project.mod_id,
+                "Specification-Vendor": project.mod_author,
+                "Specification-Version": "1",
+                "Implementation-Title": project.name,
+                "Implementation-Version": project.version,
+                "Implementation-Vendor": project.mod_author
+        )
+    }
+}

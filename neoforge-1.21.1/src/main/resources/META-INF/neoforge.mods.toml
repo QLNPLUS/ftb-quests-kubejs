@@ -1,0 +1,34 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+
+[[mods]]
+modId="ftbquestskubejs"
+version="${version}"
+displayName="FTB Quests KubeJS Events"
+authors="Questjs"
+description='''Client-side KubeJS events for opening FTB Quests chapter groups, chapters, and tasks.'''
+
+[[dependencies.ftbquestskubejs]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.0,)"
+ordering="NONE"
+side="CLIENT"
+
+[[dependencies.ftbquestskubejs]]
+modId="kubejs"
+type="required"
+versionRange="[2101.7.2,)"
+ordering="AFTER"
+side="CLIENT"
+
+[[dependencies.ftbquestskubejs]]
+modId="ftbquests"
+type="required"
+versionRange="[2101.1.34,)"
+ordering="AFTER"
+side="CLIENT"
+
+[[mixins]]
+config="ftbquestskubejs.mixins.json"

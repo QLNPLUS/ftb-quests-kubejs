@@ -1,0 +1,1 @@
+dev.questjs.ftbquestskubejs.FTBQuestsKubeJSPlugin client

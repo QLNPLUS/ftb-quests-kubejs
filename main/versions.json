@@ -1,0 +1,32 @@
+{
+  "projects": [
+    {
+      "directory": "forge-1.19.2",
+      "minecraft": "1.19.2",
+      "loader": "forge",
+      "java": 17,
+      "runTask": "runClient"
+    },
+    {
+      "directory": "forge-1.20.1",
+      "minecraft": "1.20.1",
+      "loader": "forge",
+      "java": 17,
+      "runTask": "runClient"
+    },
+    {
+      "directory": "neoforge-1.21.1",
+      "minecraft": "1.21.1",
+      "loader": "neoforge",
+      "java": 21,
+      "runTask": "runClient"
+    },
+    {
+      "directory": "neoforge-1.26.1.2",
+      "minecraft": "26.1.2",
+      "loader": "neoforge",
+      "java": 25,
+      "runTask": "runClient"
+    }
+  ]
+}

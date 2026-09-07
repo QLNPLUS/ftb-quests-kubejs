@@ -1,0 +1,83 @@
+plugins {
+    id "base"
+    id "java"
+    id "net.neoforged.moddev" version "2.0.140"
+}
+
+group = project.maven_group
+version = project.mod_version
+base.archivesName = project.archives_base_name
+
+def neoforgeMirror = System.getenv("NEOFORGE_MAVEN_MIRROR")
+
+def dependencyFiles = fileTree("libs") {
+    include "*.jar"
+    exclude "architectury-neoforge-19.0.1.jar"
+}.files
+
+neoForge {
+    enable {
+        version = project.neoforge_version
+
+        runs {
+            client {
+                client()
+                gameDirectory = file("runs/client")
+            }
+            server {
+                server()
+                programArgument "--nogui"
+                gameDirectory = file("runs/server")
+            }
+        }
+
+        mods {
+            ftbquestskubejs {
+                sourceSet sourceSets.main
+            }
+        }
+    }
+}
+
+repositories {
+    if (neoforgeMirror != null && !neoforgeMirror.isBlank()) {
+        maven { url = uri(neoforgeMirror) }
+    }
+    mavenCentral()
+    maven { url = "https://maven.neoforged.net/releases" }
+    maven { url = "https://maven.ftb.dev/releases" }
+}
+
+dependencies {
+    implementation files(dependencyFiles)
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.release = 25
+}
+
+processResources {
+    inputs.property "version", project.version
+    filesMatching("META-INF/neoforge.mods.toml") {
+        expand version: project.version
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+                "Specification-Title": project.mod_id,
+                "Specification-Vendor": project.mod_author,
+                "Specification-Version": "1",
+                "Implementation-Title": project.name,
+                "Implementation-Version": project.version,
+                "Implementation-Vendor": project.mod_author
+        )
+    }
+}
