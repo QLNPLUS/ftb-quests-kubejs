@@ -1,0 +1,209 @@
+name: Publish CurseForge
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Git tag to build and publish, for example v0.1.0
+        required: true
+        type: string
+      loader:
+        description: Publish all loaders or retry one loader family
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - forge
+          - neoforge
+
+permissions:
+  contents: read
+
+concurrency:
+  group: curseforge-${{ github.repository }}-${{ github.event.release.tag_name || inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  RELEASE_VERSION: ${{ github.event.release.tag_name || inputs.tag || github.ref_name }}
+
+jobs:
+  publish-forge:
+    if: ${{ github.event_name == 'release' || inputs.loader == 'all' || inputs.loader == 'forge' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - directory: forge-1.19.2
+            branch: forge-1.19.2
+            loader: forge
+            minecraft: 1.19.2
+            java: '17'
+          - directory: forge-1.20.1
+            branch: forge-1.20.1
+            loader: forge
+            minecraft: 1.20.1
+            java: '17'
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag || matrix.branch }}
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Prepare release version
+        run: echo "CURSEFORGE_VERSION=${RELEASE_VERSION#v}" >> "$GITHUB_ENV"
+
+      - name: Validate CurseForge configuration
+        env:
+          CURSEFORGE_PROJECT_ID: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+        run: |
+          test -n "$CURSEFORGE_PROJECT_ID"
+          test -n "$CURSEFORGE_TOKEN"
+
+      - name: Build Forge mod
+        working-directory: ${{ matrix.directory }}
+        run: |
+          chmod +x gradlew
+          ./gradlew clean build --no-daemon -Pmod_version="$CURSEFORGE_VERSION"
+
+      - name: Verify Forge artifact
+        working-directory: ${{ matrix.directory }}
+        run: |
+          find build/libs -maxdepth 1 -type f -name '*.jar' -print
+          expected="build/libs/ftb-quests-kubejs-${CURSEFORGE_VERSION}.jar"
+          test -f "$expected"
+          echo "CURSEFORGE_FILE=${{ matrix.directory }}/$expected" >> "$GITHUB_ENV"
+
+      - name: Prepare current changelog
+        env:
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+        run: |
+          version="${RELEASE_VERSION#v}"
+          awk -v version="$version" '
+            /^##[[:space:]]+/ {
+              heading = $2
+              gsub(/^\[/, "", heading)
+              gsub(/\].*$/, "", heading)
+              if (found && heading != version) exit
+              if (heading == version) found = 1
+            }
+            found { print }
+          ' CHANGELOG.md > build-curseforge-changelog.md
+          test -s build-curseforge-changelog.md
+
+      - name: Publish Forge file to CurseForge
+        uses: Kira-NT/mc-publish@v3
+        with:
+          curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          files: ${{ env.CURSEFORGE_FILE }}
+          version: ${{ env.CURSEFORGE_VERSION }}
+          name: ftb-quests-kubejs-${{ matrix.loader }}-${{ matrix.minecraft }}-${{ env.CURSEFORGE_VERSION }}
+          version-type: release
+          changelog-file: build-curseforge-changelog.md
+          loaders: ${{ matrix.loader }}
+          game-versions: ${{ matrix.minecraft }}
+          java: ${{ matrix.java }}
+
+  publish-neoforge:
+    if: ${{ github.event_name == 'release' || inputs.loader == 'all' || inputs.loader == 'neoforge' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - directory: neoforge-1.21.1
+            branch: neoforge-1.21.1
+            loader: neoforge
+            minecraft: 1.21.1
+            java: '21'
+          - directory: neoforge-1.26.1.2
+            branch: neoforge-1.26.1.2
+            loader: neoforge
+            minecraft: 26.1.2
+            java: '25'
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag || matrix.branch }}
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Prepare release version
+        run: echo "CURSEFORGE_VERSION=${RELEASE_VERSION#v}" >> "$GITHUB_ENV"
+
+      - name: Validate CurseForge configuration
+        env:
+          CURSEFORGE_PROJECT_ID: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+        run: |
+          test -n "$CURSEFORGE_PROJECT_ID"
+          test -n "$CURSEFORGE_TOKEN"
+
+      - name: Build NeoForge mod
+        working-directory: ${{ matrix.directory }}
+        run: |
+          chmod +x gradlew
+          ./gradlew clean build --no-daemon -Pmod_version="$CURSEFORGE_VERSION"
+
+      - name: Verify NeoForge artifact
+        working-directory: ${{ matrix.directory }}
+        run: |
+          find build/libs -maxdepth 1 -type f -name '*.jar' -print
+          expected="build/libs/ftb-quests-kubejs-${CURSEFORGE_VERSION}.jar"
+          test -f "$expected"
+          echo "CURSEFORGE_FILE=${{ matrix.directory }}/$expected" >> "$GITHUB_ENV"
+
+      - name: Prepare current changelog
+        env:
+          RELEASE_VERSION: ${{ env.RELEASE_VERSION }}
+        run: |
+          version="${RELEASE_VERSION#v}"
+          awk -v version="$version" '
+            /^##[[:space:]]+/ {
+              heading = $2
+              gsub(/^\[/, "", heading)
+              gsub(/\].*$/, "", heading)
+              if (found && heading != version) exit
+              if (heading == version) found = 1
+            }
+            found { print }
+          ' CHANGELOG.md > build-curseforge-changelog.md
+          test -s build-curseforge-changelog.md
+
+      - name: Publish NeoForge file to CurseForge
+        uses: Kira-NT/mc-publish@v3
+        with:
+          curseforge-id: ${{ vars.CURSEFORGE_PROJECT_ID }}
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          files: ${{ env.CURSEFORGE_FILE }}
+          version: ${{ env.CURSEFORGE_VERSION }}
+          name: ftb-quests-kubejs-${{ matrix.loader }}-${{ matrix.minecraft }}-${{ env.CURSEFORGE_VERSION }}
+          version-type: release
+          changelog-file: build-curseforge-changelog.md
+          loaders: ${{ matrix.loader }}
+          game-versions: ${{ matrix.minecraft }}
+          java: ${{ matrix.java }}

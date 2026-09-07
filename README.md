@@ -64,3 +64,14 @@ From PowerShell:
 ```
 
 The four projects use their own Gradle wrapper, Java toolchain, dependencies, run directory, and release artifact.
+
+## CurseForge Publishing
+
+The workflow at `.github/workflows/curseforge-publish.yml` publishes all four loader/version builds when a GitHub Release is published. It also supports manual retries for `all`, `forge`, or `neoforge`.
+
+Configure these repository settings before publishing:
+
+- Repository variable `CURSEFORGE_PROJECT_ID`: `1685965`
+- Repository secret `CURSEFORGE_TOKEN`: a CurseForge API token
+
+Create a GitHub Release with a tag such as `v0.1.0`. The matching `CHANGELOG.md` section is uploaded with each CurseForge file. The workflow builds the exact release version by passing the tag version to Gradle.
