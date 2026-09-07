@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "ftbquestskubejs",
+  "version": "${version}",
+  "name": "FTB Quests KubeJS Events",
+  "description": "Client-side KubeJS events for opening and closing FTB Quests chapter groups, chapters, and quest detail panels.",
+  "authors": [
+    "Questjs"
+  ],
+  "license": "MIT",
+  "environment": "client",
+  "mixins": [
+    "ftbquestskubejs.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.11",
+    "minecraft": "1.20.1",
+    "fabric-api": ">=0.92.2+1.20.1",
+    "architectury": ">=9.1.12",
+    "kubejs": ">=2001.6.5",
+    "ftbquests": ">=2001.4.22",
+    "ftblibrary": ">=2001.2.9",
+    "ftbteams": ">=2001.3.0",
+    "rhino": ">=2001.2.2"
+  }
+}

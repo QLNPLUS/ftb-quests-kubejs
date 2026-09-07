@@ -8,6 +8,7 @@ A client-side addon that exposes FTB Quests GUI state changes to KubeJS scripts.
 | --- | --- | --- | --- | --- |
 | `forge-1.19.2` | 1.19.2 | Forge | 1902.5.10-build.497 | 1902.6.2-build.73 |
 | `forge-1.20.1` | 1.20.1 | Forge | 2001.4.22 | 2001.6.5-build.26 |
+| `fabric-1.20.1` | 1.20.1 | Fabric | 2001.4.22 | 2001.6.5-build.26 |
 | `neoforge-1.21.1` | 1.21.1 | NeoForge | 2101.1.34 | 2101.7.2-build.374 |
 | `neoforge-1.26.1.2` | 26.1.2 | NeoForge | 26.1.2.7 | 26.1.2-8.0.4+neoforge |
 
@@ -49,6 +50,7 @@ All events are client events. The event object exposes `player`, `chapterGroup`,
 
 - `forge-1.19.2/`: Forge 1.19.2 project
 - `forge-1.20.1/`: Forge 1.20.1 project
+- `fabric-1.20.1/`: Fabric 1.20.1 project
 - `neoforge-1.21.1/`: NeoForge 1.21.1 project
 - `neoforge-1.26.1.2/`: NeoForge 26.1.2 project
 - `main/`: build, packaging validation, smoke-test, and version documentation
@@ -63,15 +65,15 @@ From PowerShell:
 ./main/validate-artifacts.ps1
 ```
 
-The four projects use their own Gradle wrapper, Java toolchain, dependencies, run directory, and release artifact.
+The five projects use their own Gradle wrapper, Java toolchain, dependencies, run directory, and release artifact.
 
 ## CurseForge Publishing
 
-The workflow at `.github/workflows/curseforge-publish.yml` publishes all four loader/version builds when a GitHub Release is published. It also supports manual retries for `all`, `forge`, or `neoforge`.
+The workflow at `.github/workflows/curseforge-publish.yml` publishes all five loader/version builds when a GitHub Release is published. It also supports manual retries for `all`, `forge`, `fabric`, or `neoforge` from an explicit branch or tag.
 
 Configure these repository settings before publishing:
 
 - Repository variable `CURSEFORGE_PROJECT_ID`: `1685965`
 - Repository secret `CURSEFORGE_TOKEN`: a CurseForge API token
 
-Create a GitHub Release with a tag such as `v0.1.0`. The matching `CHANGELOG.md` section is uploaded with each CurseForge file. The workflow builds the exact release version by passing the tag version to Gradle.
+Create a GitHub Release with a tag such as `v1.0.0`, or manually provide `ref=main` and `version=1.0.0`. The matching `CHANGELOG.md` section is uploaded with each CurseForge file. The workflow builds the exact release version by passing the selected version to Gradle.

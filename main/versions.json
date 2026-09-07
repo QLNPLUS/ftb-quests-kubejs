@@ -15,6 +15,13 @@
       "runTask": "runClient"
     },
     {
+      "directory": "fabric-1.20.1",
+      "minecraft": "1.20.1",
+      "loader": "fabric",
+      "java": 17,
+      "runTask": "runClient"
+    },
+    {
       "directory": "neoforge-1.21.1",
       "minecraft": "1.21.1",
       "loader": "neoforge",

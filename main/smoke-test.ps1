@@ -4,6 +4,7 @@ $root = Split-Path -Parent $PSScriptRoot
 $targets = @(
     @{ Directory = "forge-1.19.2"; Java = "C:\Program Files\Java\jdk-17" },
     @{ Directory = "forge-1.20.1"; Java = "C:\Program Files\Java\jdk-17" },
+    @{ Directory = "fabric-1.20.1"; Java = "C:\Program Files\Java\jdk-17" },
     @{ Directory = "neoforge-1.21.1"; Java = "C:\Program Files\Java\jdk-21" },
     @{ Directory = "neoforge-1.26.1.2"; Java = "C:\Program Files\Java\jdk-25.0.4.1" }
 )

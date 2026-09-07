@@ -1,0 +1,9 @@
+pluginManagement {
+    repositories {
+        maven { url = "https://maven.fabricmc.net/" }
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "ftb-quests-kubejs-fabric-1.20.1"

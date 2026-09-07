@@ -4,6 +4,7 @@ $root = Split-Path -Parent $PSScriptRoot
 $targets = @(
     @{ Directory = "forge-1.19.2"; PackFormat = 9 },
     @{ Directory = "forge-1.20.1"; PackFormat = 15 },
+    @{ Directory = "fabric-1.20.1"; PackFormat = 15 },
     @{ Directory = "neoforge-1.21.1"; PackFormat = 34 },
     @{ Directory = "neoforge-1.26.1.2"; PackFormat = 84 }
 )
@@ -11,7 +12,15 @@ $targets = @(
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 foreach ($target in $targets) {
-    $jarPath = Join-Path $root "$($target.Directory)\build\libs\ftb-quests-kubejs-0.1.0.jar"
+    $projectDir = Join-Path $root $target.Directory
+    $versionLine = Get-Content -LiteralPath (Join-Path $projectDir "gradle.properties") |
+        Select-String -Pattern '^mod_version=' |
+        Select-Object -First 1
+    if ($null -eq $versionLine) {
+        throw "$($target.Directory): mod_version is missing from gradle.properties"
+    }
+    $version = ($versionLine.Line -split "=", 2)[1].Trim()
+    $jarPath = Join-Path $root "$($target.Directory)\build\libs\ftb-quests-kubejs-$version.jar"
     if (-not (Test-Path -LiteralPath $jarPath)) {
         throw "Release JAR not found: $jarPath"
     }

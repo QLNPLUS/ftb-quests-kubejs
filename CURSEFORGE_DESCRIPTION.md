@@ -51,7 +51,7 @@ Install the matching release for your Minecraft version and loader together with
 
 - FTB Quests
 - KubeJS
-- The required loader: Forge or NeoForge
+- The required loader: Forge, Fabric, or NeoForge
 
 The addon does not replace FTB Quests or KubeJS. It only exposes FTB Quests client GUI transitions to KubeJS scripts.
 
@@ -59,6 +59,7 @@ The addon does not replace FTB Quests or KubeJS. It only exposes FTB Quests clie
 
 - Forge 1.19.2
 - Forge 1.20.1
+- Fabric 1.20.1
 - NeoForge 1.21.1
 - NeoForge 26.1.2
 
