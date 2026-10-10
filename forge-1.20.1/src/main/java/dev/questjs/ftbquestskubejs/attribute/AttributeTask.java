@@ -35,7 +35,7 @@ public final class AttributeTask extends Task {
     public static final TaskType TYPE = TaskTypes.register(
             new ResourceLocation(TASK_NAMESPACE, "attribute_check"),
             AttributeTask::new,
-            () -> Icon.getIcon("minecraft:paper")
+            () -> Icon.getIcon("minecraft:iron_chestplate")
     );
 
     private final List<AttributeCondition> conditions = new ArrayList<>();

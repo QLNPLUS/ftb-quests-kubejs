@@ -79,7 +79,7 @@ public final class CustomDataNumberTask extends Task {
     public static final TaskType TYPE = TaskTypes.register(
             Identifier.fromNamespaceAndPath(TASK_NAMESPACE, "custom_data_number"),
             CustomDataNumberTask::new,
-            () -> Icon.getIcon("minecraft:command_block")
+            () -> Icon.getIcon("minecraft:name_tag")
     );
 
     private String path = "";
