@@ -3,7 +3,7 @@ package dev.questjs.ftbquestskubejs.attribute;
 import dev.ftb.mods.ftblibrary.config.ConfigCallback;
 import dev.ftb.mods.ftblibrary.config.EnumConfig;
 import dev.ftb.mods.ftblibrary.config.NameMap;
-import dev.ftb.mods.ftblibrary.icon.Icon;
+import dev.ftb.mods.ftblibrary.icon.ItemIcon;
 import dev.ftb.mods.ftblibrary.ui.Panel;
 import dev.ftb.mods.ftblibrary.ui.SimpleTextButton;
 import dev.ftb.mods.ftblibrary.ui.Widget;
@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -42,7 +43,7 @@ final class AttributeDropdownConfig extends EnumConfig<ResourceLocation> {
         return NameMap.of(defaultId, ids)
                 .id(ResourceLocation::toString)
                 .name(AttributeDropdownConfig::displayName)
-                .icon(id -> Icon.getIcon("minecraft:paper"))
+                .icon(id -> ItemIcon.getItemIcon(Items.IRON_CHESTPLATE))
                 .create();
     }
 

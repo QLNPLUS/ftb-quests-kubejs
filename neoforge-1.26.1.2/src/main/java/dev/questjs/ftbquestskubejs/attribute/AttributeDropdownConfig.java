@@ -1,13 +1,14 @@
 package dev.questjs.ftbquestskubejs.attribute;
 
 import dev.ftb.mods.ftblibrary.client.config.editable.EditableEnum;
-import dev.ftb.mods.ftblibrary.icon.Icon;
+import dev.ftb.mods.ftblibrary.icon.ItemIcon;
 import dev.ftb.mods.ftblibrary.util.NameMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
 
 import java.util.Comparator;
 import java.util.List;
@@ -29,7 +30,7 @@ final class AttributeDropdownConfig extends EditableEnum<Identifier> {
         return NameMap.of(defaultId, ids)
                 .id(Identifier::toString)
                 .name(AttributeDropdownConfig::displayName)
-                .icon(id -> Icon.getIcon("minecraft:paper"))
+                .icon(id -> ItemIcon.ofItem(Items.IRON_CHESTPLATE))
                 .create();
     }
 

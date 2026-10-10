@@ -1,7 +1,7 @@
 package dev.questjs.ftbquestskubejs.attribute;
 
 import dev.ftb.mods.ftblibrary.config.ConfigGroup;
-import dev.ftb.mods.ftblibrary.icon.Icon;
+import dev.ftb.mods.ftblibrary.icon.ItemIcon;
 import dev.ftb.mods.ftbquests.quest.Quest;
 import dev.ftb.mods.ftbquests.quest.TeamData;
 import dev.ftb.mods.ftbquests.quest.task.Task;
@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -35,7 +36,7 @@ public final class AttributeTask extends Task {
     public static final TaskType TYPE = TaskTypes.register(
             new ResourceLocation(TASK_NAMESPACE, "attribute_check"),
             AttributeTask::new,
-            () -> Icon.getIcon("minecraft:iron_chestplate")
+            () -> ItemIcon.getItemIcon(Items.IRON_CHESTPLATE)
     );
 
     private final List<AttributeCondition> conditions = new ArrayList<>();

@@ -2,7 +2,7 @@ package dev.questjs.ftbquestskubejs.data;
 
 import dev.ftb.mods.ftblibrary.config.ConfigGroup;
 import dev.ftb.mods.ftblibrary.config.NameMap;
-import dev.ftb.mods.ftblibrary.icon.Icon;
+import dev.ftb.mods.ftblibrary.icon.ItemIcon;
 import dev.ftb.mods.ftbquests.quest.Quest;
 import dev.ftb.mods.ftbquests.quest.TeamData;
 import dev.ftb.mods.ftbquests.quest.task.Task;
@@ -17,6 +17,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -62,7 +63,7 @@ public final class CustomDataNumberTask extends Task {
     public static final TaskType TYPE = TaskTypes.register(
             new ResourceLocation(TASK_NAMESPACE, "custom_data_number"),
             CustomDataNumberTask::new,
-            () -> Icon.getIcon("minecraft:name_tag")
+            () -> ItemIcon.getItemIcon(Items.NAME_TAG)
     );
 
     private String path = "";

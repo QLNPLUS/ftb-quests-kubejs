@@ -6,7 +6,7 @@ import de.marhali.json5.Json5Object;
 import dev.ftb.mods.ftblibrary.client.config.EditableConfigGroup;
 import dev.ftb.mods.ftblibrary.client.gui.input.MouseButton;
 import dev.ftb.mods.ftblibrary.client.gui.widget.Widget;
-import dev.ftb.mods.ftblibrary.icon.Icon;
+import dev.ftb.mods.ftblibrary.icon.ItemIcon;
 import dev.ftb.mods.ftblibrary.json5.Json5Util;
 import dev.ftb.mods.ftblibrary.util.NameMap;
 import dev.ftb.mods.ftbquests.quest.Quest;
@@ -24,6 +24,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 
 import java.lang.reflect.Method;
@@ -79,7 +80,7 @@ public final class CustomDataNumberTask extends Task {
     public static final TaskType TYPE = TaskTypes.register(
             Identifier.fromNamespaceAndPath(TASK_NAMESPACE, "custom_data_number"),
             CustomDataNumberTask::new,
-            () -> Icon.getIcon("minecraft:name_tag")
+            () -> ItemIcon.ofItem(Items.NAME_TAG)
     );
 
     private String path = "";

@@ -2,7 +2,7 @@ package dev.questjs.ftbquestskubejs.attribute;
 
 import de.marhali.json5.Json5Object;
 import dev.ftb.mods.ftblibrary.client.config.EditableConfigGroup;
-import dev.ftb.mods.ftblibrary.icon.Icon;
+import dev.ftb.mods.ftblibrary.icon.ItemIcon;
 import dev.ftb.mods.ftblibrary.json5.Json5Util;
 import dev.ftb.mods.ftbquests.quest.Quest;
 import dev.ftb.mods.ftbquests.quest.TeamData;
@@ -19,6 +19,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public final class AttributeTask extends Task {
     public static final TaskType TYPE = TaskTypes.register(
             Identifier.fromNamespaceAndPath(TASK_NAMESPACE, "attribute_check"),
             AttributeTask::new,
-            () -> Icon.getIcon("minecraft:iron_chestplate")
+            () -> ItemIcon.ofItem(Items.IRON_CHESTPLATE)
     );
 
     private final List<AttributeCondition> conditions = new ArrayList<>();
