@@ -36,7 +36,7 @@ import java.util.OptionalDouble;
  * Completes when a numeric value stored in the player's persistent data
  * satisfies the configured comparison. Two stores are consulted, in order:
  * the KubeJS store ({@code KubeJSPersistentData}, written by
- * {@code /kubejs persistent_data} and {@code entity.persistentData} in scripts)
+ * {@code /kubejs persistent} and {@code entity.persistentData} in scripts)
  * and the NeoForge store ({@code PersistentData}, written by
  * {@code /data merge entity @s {PersistentData:{...}}}). Negative and
  * fractional numbers are supported; every numeric NBT tag type is read as a
