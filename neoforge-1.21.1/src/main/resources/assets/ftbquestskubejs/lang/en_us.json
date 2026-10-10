@@ -1,5 +1,7 @@
 {
   "ftbquests.task.ftbq_attribute_tasks.attribute_check": "Player Attributes",
+  "ftbquests.task.ftbquestskubejs.custom_data_number": "Custom Data Number",
+  "ftbquestskubejs.config.data_path": "Data path (dot-separated; KubeJS data first, then PersistentData)",
   "ftbq_attribute_tasks.config.conditions": "Attribute requirements (all must match)",
   "ftbq_attribute_tasks.config.condition": "Attribute condition",
   "ftbq_attribute_tasks.config.attribute": "Player attribute",
