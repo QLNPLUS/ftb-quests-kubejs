@@ -1,0 +1,16 @@
+{
+  "ftbquests.task.ftbq_attribute_tasks.attribute_check": "Player Attributes",
+  "ftbq_attribute_tasks.config.conditions": "Attribute requirements (all must match)",
+  "ftbq_attribute_tasks.config.condition": "Attribute condition",
+  "ftbq_attribute_tasks.config.attribute": "Player attribute",
+  "ftbq_attribute_tasks.config.comparison": "Comparison",
+  "ftbq_attribute_tasks.config.threshold_or_lower_bound": "Threshold / inclusive minimum",
+  "ftbq_attribute_tasks.config.upper_bound_range_only": "Inclusive maximum (range only)",
+  "ftbq_attribute_tasks.error.invalid_condition": "Invalid condition. A range needs a finite minimum no greater than its maximum.",
+  "ftbq_attribute_tasks.operator.greater_than": "Greater than",
+  "ftbq_attribute_tasks.operator.greater_than_or_equal": "Greater than or equal to",
+  "ftbq_attribute_tasks.operator.less_than": "Less than",
+  "ftbq_attribute_tasks.operator.less_than_or_equal": "Less than or equal to",
+  "ftbq_attribute_tasks.operator.equal": "Equal to",
+  "ftbq_attribute_tasks.operator.range": "In inclusive range"
+}

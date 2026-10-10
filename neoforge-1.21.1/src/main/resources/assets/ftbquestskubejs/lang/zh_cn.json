@@ -1,0 +1,16 @@
+{
+  "ftbquests.task.ftbq_attribute_tasks.attribute_check": "玩家属性",
+  "ftbq_attribute_tasks.config.conditions": "属性条件（全部满足）",
+  "ftbq_attribute_tasks.config.condition": "属性条件",
+  "ftbq_attribute_tasks.config.attribute": "玩家属性",
+  "ftbq_attribute_tasks.config.comparison": "比较方式",
+  "ftbq_attribute_tasks.config.threshold_or_lower_bound": "阈值／范围下限（含端点）",
+  "ftbq_attribute_tasks.config.upper_bound_range_only": "范围上限（含端点，仅范围模式使用）",
+  "ftbq_attribute_tasks.error.invalid_condition": "属性条件无效。范围模式要求有限数值，且下限不得大于上限。",
+  "ftbq_attribute_tasks.operator.greater_than": "大于",
+  "ftbq_attribute_tasks.operator.greater_than_or_equal": "大于等于",
+  "ftbq_attribute_tasks.operator.less_than": "小于",
+  "ftbq_attribute_tasks.operator.less_than_or_equal": "小于等于",
+  "ftbq_attribute_tasks.operator.equal": "等于",
+  "ftbq_attribute_tasks.operator.range": "范围（含端点）"
+}

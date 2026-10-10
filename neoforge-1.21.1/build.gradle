@@ -32,6 +32,11 @@ neoForge {
             }
         }
     }
+
+    unitTest {
+        enable()
+        testedMod = mods.ftbquestskubejs
+    }
 }
 
 repositories {
@@ -49,6 +54,14 @@ def dependencyFiles = fileTree("libs") {
 
 dependencies {
     implementation files(dependencyFiles)
+
+    testImplementation platform('org.junit:junit-bom:5.10.2')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }
 
 java {
