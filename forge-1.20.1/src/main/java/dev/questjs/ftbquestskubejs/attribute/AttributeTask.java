@@ -7,6 +7,7 @@ import dev.ftb.mods.ftbquests.quest.TeamData;
 import dev.ftb.mods.ftbquests.quest.task.Task;
 import dev.ftb.mods.ftbquests.quest.task.TaskType;
 import dev.ftb.mods.ftbquests.quest.task.TaskTypes;
+import dev.questjs.ftbquestskubejs.composite.ReevaluableTask;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
-public final class AttributeTask extends Task {
+public final class AttributeTask extends Task implements ReevaluableTask {
     /**
      * Kept as the original standalone mod's namespace so quest files authored
      * against More And More Quest load unchanged inside QuestJS.
@@ -104,9 +105,14 @@ public final class AttributeTask extends Task {
             return;
         }
 
-        if (AttributeConditionEvaluator.allMatch(conditions, id -> readAttributeValue(player, id))) {
+        if (isSatisfiedNow(teamData, player)) {
             teamData.setProgress(this, 1L);
         }
+    }
+
+    @Override
+    public boolean isSatisfiedNow(TeamData teamData, ServerPlayer player) {
+        return AttributeConditionEvaluator.allMatch(conditions, id -> readAttributeValue(player, id));
     }
 
     private static OptionalDouble readAttributeValue(ServerPlayer player, String attributeId) {

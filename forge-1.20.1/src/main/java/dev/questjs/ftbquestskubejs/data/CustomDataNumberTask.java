@@ -9,6 +9,7 @@ import dev.ftb.mods.ftbquests.quest.task.Task;
 import dev.ftb.mods.ftbquests.quest.task.TaskType;
 import dev.ftb.mods.ftbquests.quest.task.TaskTypes;
 import dev.questjs.ftbquestskubejs.attribute.ComparisonOperator;
+import dev.questjs.ftbquestskubejs.composite.ReevaluableTask;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NumericTag;
 import net.minecraft.nbt.Tag;
@@ -36,7 +37,7 @@ import java.util.OptionalDouble;
  * fractional numbers are supported; every numeric NBT tag type is read as a
  * double.
  */
-public final class CustomDataNumberTask extends Task {
+public final class CustomDataNumberTask extends Task implements ReevaluableTask {
     public static final String TASK_NAMESPACE = "ftbquestskubejs";
 
     private static final String PATH_TAG = "path";
@@ -152,15 +153,20 @@ public final class CustomDataNumberTask extends Task {
             return;
         }
 
+        if (isSatisfiedNow(teamData, player)) {
+            teamData.setProgress(this, 1L);
+        }
+    }
+
+    @Override
+    public boolean isSatisfiedNow(TeamData teamData, ServerPlayer player) {
         CustomDataNumberCondition condition = new CustomDataNumberCondition(path, comparison, value, upperValue);
         if (!condition.isValid()) {
-            return;
+            return false;
         }
 
         OptionalDouble actual = readNumericRoots(kubeJsPersistentData(player), player.getPersistentData(), path);
-        if (actual.isPresent() && condition.matches(actual.getAsDouble())) {
-            teamData.setProgress(this, 1L);
-        }
+        return actual.isPresent() && condition.matches(actual.getAsDouble());
     }
 
     private static CompoundTag kubeJsPersistentData(ServerPlayer player) {
