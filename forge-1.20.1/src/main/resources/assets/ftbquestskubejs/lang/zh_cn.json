@@ -11,6 +11,7 @@
   "ftbquestskubejs.config.sub_task_5": "子任务 6",
   "ftbquestskubejs.config.sub_task_6": "子任务 7",
   "ftbquestskubejs.config.sub_task_7": "子任务 8",
+  "ftbquestskubejs.config.sub_task_add": "添加子任务",
   "ftbquestskubejs.config.sub_task_type": "子任务类型",
   "ftbquestskubejs.config.sub_task_none": "（空）",
   "ftbquestskubejs.config.sub_task_clear": "清除此槽位",

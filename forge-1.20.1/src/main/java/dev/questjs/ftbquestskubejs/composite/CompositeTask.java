@@ -65,7 +65,11 @@ public final class CompositeTask extends Task {
     private static final String SUB_TASKS_TAG = "sub_tasks";
     private static final String TYPE_TAG = "type";
 
-    /** Guards against an unbounded config panel and a runaway per-tick cost. */
+    /**
+     * A ceiling, not a row count. The editor shows one row per sub-task plus an
+     * append row, so this only bounds the config panel and the per-tick cost of
+     * re-evaluating every sub-task.
+     */
     public static final int MAX_SUB_TASKS = 8;
     public static final int DEFAULT_WINDOW_TICKS = 20;
     public static final int MIN_WINDOW_TICKS = 1;
@@ -270,13 +274,16 @@ public final class CompositeTask extends Task {
                 DEFAULT_WINDOW_TICKS, MIN_WINDOW_TICKS, MAX_WINDOW_TICKS)
                 .setNameKey("ftbquestskubejs.config.window_ticks");
 
-        for (int index = 0; index < MAX_SUB_TASKS; index++) {
+        // Only slots that hold something get a row. The list grows through the
+        // append row below instead of showing MAX_SUB_TASKS empty rows, which
+        // also removes the gap case: there is no way to fill slot 5 before slot 0.
+        for (int index = 0; index < subTasks.size(); index++) {
             final int slot = index;
             ConfigGroup subgroup = config.getOrCreateSubgroup("subtask_" + slot, MAX_SUB_TASKS);
             // ConfigGroup.getName() is Component.translatable(getNameKey()) with
             // no argument substitution, so each slot needs its own key.
             subgroup.setNameKey("ftbquestskubejs.config.sub_task_" + slot);
-            Task child = slot < subTasks.size() ? subTasks.get(slot) : null;
+            Task child = subTasks.get(slot);
             // A dropdown rather than a click-cycled enum: the whole set of usable
             // task types has to be visible at once. See SubTaskTypeConfig.
             subgroup.add(TYPE_TAG, new SubTaskTypeConfig(this, slot), child, value -> {
@@ -286,6 +293,15 @@ public final class CompositeTask extends Task {
                 // panel, so a newly chosen type's fields appear right away.
                 child.fillConfigGroup(subgroup);
             }
+        }
+
+        if (subTasks.size() < MAX_SUB_TASKS) {
+            // An append row rather than a spare slot: picking a type here adds one
+            // more sub-task, and the reopened panel already exposes its fields.
+            ConfigGroup addRow = config.getOrCreateSubgroup("subtask_add", MAX_SUB_TASKS + 1);
+            addRow.setNameKey("ftbquestskubejs.config.sub_task_add");
+            addRow.add(TYPE_TAG, new SubTaskTypeConfig(this, subTasks.size()), null, value -> {
+            }, null).setNameKey("ftbquestskubejs.config.sub_task_add");
         }
     }
 
