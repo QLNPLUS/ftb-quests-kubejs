@@ -92,10 +92,10 @@ final class AttributeConditionConfig extends ConfigValue<AttributeCondition> {
         group.addEnum("comparison", draft.comparison, value -> draft.comparison = value, comparisonNames)
                 .setNameKey("ftbq_attribute_tasks.config.comparison");
         group.addDouble("value", draft.value, value -> draft.value = value,
-                draft.value, -Double.MAX_VALUE, Double.MAX_VALUE)
+                draft.value, -1.0E15, 1.0E15)
                 .setNameKey("ftbq_attribute_tasks.config.threshold_or_lower_bound");
         group.addDouble("upper_value", draft.upperValue, value -> draft.upperValue = value,
-                draft.upperValue, -Double.MAX_VALUE, Double.MAX_VALUE)
+                draft.upperValue, -1.0E15, 1.0E15)
                 .setNameKey("ftbq_attribute_tasks.config.upper_bound_range_only");
         group.setNameKey("ftbq_attribute_tasks.config.condition");
 

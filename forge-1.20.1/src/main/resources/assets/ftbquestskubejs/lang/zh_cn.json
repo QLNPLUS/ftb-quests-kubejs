@@ -1,7 +1,7 @@
 {
   "ftbquests.task.ftbq_attribute_tasks.attribute_check": "玩家属性",
   "ftbquests.task.ftbquestskubejs.custom_data_number": "自定义数据数值",
-  "ftbquestskubejs.config.data_path": "数据路径（点分隔，位于玩家 PersistentData 内）",
+  "ftbquestskubejs.config.data_path": "数据路径（点分隔；先查 KubeJS 持久数据，再查 PersistentData）",
   "ftbq_attribute_tasks.config.conditions": "属性条件（全部满足）",
   "ftbq_attribute_tasks.config.condition": "属性条件",
   "ftbq_attribute_tasks.config.attribute": "玩家属性",

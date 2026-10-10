@@ -16,18 +16,24 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.OptionalDouble;
 
 /**
  * Completes when a numeric value stored in the player's persistent data
- * ({@code PersistentData} compound, written by commands or other mods)
- * satisfies the configured comparison. Supports negative and fractional
- * numbers; every numeric NBT tag type is read as a double.
+ * satisfies the configured comparison. Two stores are consulted, in order:
+ * the KubeJS store ({@code KubeJSPersistentData}, written by
+ * {@code /kubejs persistent_data} and {@code entity.persistentData} in scripts)
+ * and the Forge store ({@code PersistentData}, written by
+ * {@code /data merge entity @s {PersistentData:{...}}}). Negative and
+ * fractional numbers are supported; every numeric NBT tag type is read as a
+ * double.
  */
 public final class CustomDataNumberTask extends Task {
     public static final String TASK_NAMESPACE = "ftbquestskubejs";
@@ -37,6 +43,21 @@ public final class CustomDataNumberTask extends Task {
     private static final String VALUE_TAG = "value";
     private static final String UPPER_VALUE_TAG = "upper_value";
     private static final int MAX_PATH_LENGTH = 256;
+
+    /**
+     * KubeJS injects {@code kjs$getPersistentData()} onto Entity via mixin;
+     * reflection keeps this compile-time independent of KubeJS internals.
+     * Null when KubeJS is absent, in which case only the Forge store is read.
+     */
+    private static final Method KJS_GET_PERSISTENT_DATA = findKjsPersistentDataMethod();
+
+    private static Method findKjsPersistentDataMethod() {
+        try {
+            return Entity.class.getMethod("kjs$getPersistentData");
+        } catch (NoSuchMethodException exception) {
+            return null;
+        }
+    }
 
     public static final TaskType TYPE = TaskTypes.register(
             new ResourceLocation(TASK_NAMESPACE, "custom_data_number"),
@@ -112,10 +133,10 @@ public final class CustomDataNumberTask extends Task {
         config.addEnum(COMPARISON_TAG, comparison, newValue -> comparison = newValue, comparisonNames)
                 .setNameKey("ftbq_attribute_tasks.config.comparison");
         config.addDouble(VALUE_TAG, value, newValue -> value = newValue,
-                value, -Double.MAX_VALUE, Double.MAX_VALUE)
+                value, -1.0E15, 1.0E15)
                 .setNameKey("ftbq_attribute_tasks.config.threshold_or_lower_bound");
         config.addDouble(UPPER_VALUE_TAG, upperValue, newValue -> upperValue = newValue,
-                upperValue, -Double.MAX_VALUE, Double.MAX_VALUE)
+                upperValue, -1.0E15, 1.0E15)
                 .setNameKey("ftbq_attribute_tasks.config.upper_bound_range_only");
     }
 
@@ -135,9 +156,21 @@ public final class CustomDataNumberTask extends Task {
             return;
         }
 
-        OptionalDouble actual = readNumericPath(player.getPersistentData(), path);
+        OptionalDouble actual = readNumericRoots(kubeJsPersistentData(player), player.getPersistentData(), path);
         if (actual.isPresent() && condition.matches(actual.getAsDouble())) {
             teamData.setProgress(this, 1L);
+        }
+    }
+
+    private static CompoundTag kubeJsPersistentData(ServerPlayer player) {
+        Method method = KJS_GET_PERSISTENT_DATA;
+        if (method == null) {
+            return null;
+        }
+        try {
+            return (CompoundTag) method.invoke(player);
+        } catch (ReflectiveOperationException exception) {
+            return null;
         }
     }
 
@@ -147,6 +180,15 @@ public final class CustomDataNumberTask extends Task {
         } catch (IllegalArgumentException exception) {
             return ComparisonOperator.GREATER_THAN_OR_EQUAL;
         }
+    }
+
+    /**
+     * Resolves the path against each root in order and returns the first
+     * numeric hit. Null roots are skipped.
+     */
+    static OptionalDouble readNumericRoots(CompoundTag first, CompoundTag second, String path) {
+        OptionalDouble value = readNumericPath(first, path);
+        return value.isPresent() ? value : readNumericPath(second, path);
     }
 
     /**

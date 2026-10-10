@@ -61,6 +61,19 @@ class CustomDataNumberPathReadTest {
         assertTrue(read(root, "inner.text.deeper").isEmpty());
     }
 
+    @Test
+    void rootsResolveInOrderWithNullsSkipped() {
+        CompoundTag kubeJs = new CompoundTag();
+        kubeJs.putInt("test", 11);
+        CompoundTag forge = new CompoundTag();
+        forge.putDouble("other", -2.5);
+
+        assertEquals(11.0, CustomDataNumberTask.readNumericRoots(kubeJs, forge, "test").orElseThrow());
+        assertEquals(-2.5, CustomDataNumberTask.readNumericRoots(kubeJs, forge, "other").orElseThrow());
+        assertEquals(11.0, CustomDataNumberTask.readNumericRoots(null, kubeJs, "test").orElseThrow());
+        assertTrue(CustomDataNumberTask.readNumericRoots(null, null, "test").isEmpty());
+    }
+
     private static OptionalDouble read(CompoundTag root, String path) {
         return CustomDataNumberTask.readNumericPath(root, path);
     }
