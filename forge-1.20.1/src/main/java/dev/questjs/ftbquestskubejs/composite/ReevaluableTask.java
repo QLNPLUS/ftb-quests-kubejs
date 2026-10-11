@@ -11,13 +11,10 @@ import net.minecraft.server.level.ServerPlayer;
  * <p>FTB Quests exposes no such predicate on {@code Task}. Its only check
  * entry point, {@code submitTask}, writes progress, and completion is a
  * one-way latch: once {@code TeamData.isCompleted(task)} turns true, the tick
- * handler skips the task forever. A composite task therefore cannot treat
- * {@code submitTask} as a condition test — doing so would latch every
- * sub-task it ever evaluated, which is exactly the "satisfied earlier, still
- * counts later" behaviour composite tasks exist to rule out.
- *
- * @see CompositeTask
- * @see ReevaluableTaskRegistry
+ * handler skips the task forever. A task type that decides completion from the
+ * player's current state therefore needs its own side-effect-free test, which
+ * is what this method is: {@code AttributeTask} and {@code CustomDataNumberTask}
+ * both answer their {@code submitTask} from it.
  */
 public interface ReevaluableTask {
     /**
