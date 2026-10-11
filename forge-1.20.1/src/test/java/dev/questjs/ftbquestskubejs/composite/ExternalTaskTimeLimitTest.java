@@ -1,11 +1,14 @@
 package dev.questjs.ftbquestskubejs.composite;
 
+import dev.ftb.mods.ftblibrary.config.IntConfig;
 import net.minecraft.nbt.CompoundTag;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The window's unit, which three different tag names have held across rewrites —
@@ -91,6 +94,47 @@ class ExternalTaskTimeLimitTest {
 			// day, and reading it as 1e9 ticks would be worse than clamping it.
 			assertEquals(ExternalTaskTask.MAX_TIME_LIMIT_TICKS,
 					ExternalTaskTask.resolveTimeLimitTicks(tag("time_limit_seconds", 1_000_000_000)));
+		}
+	}
+
+	@Nested
+	@DisplayName("the editor accepts a number digit by digit")
+	class EditorTyping {
+
+		// FTB's config field validates every keystroke: TextBox.insertText keeps the
+		// new text only when IntConfig.parse accepts it, and parse rejects anything
+		// outside its range. So the range the field is built with decides what can be
+		// typed, not just what can be saved — a floor above 9 makes an emptied field
+		// impossible to type into, because the first digit of every allowed value is
+		// itself below the floor. This is why fillConfigGroup passes a floor of 1 and
+		// leaves MIN_TIME_LIMIT_TICKS to clampTicks.
+		@Test
+		void aFloorOfTwentyRefusesTheFirstDigitOfEveryLegalValue() {
+			IntConfig broken = new IntConfig(ExternalTaskTask.MIN_TIME_LIMIT_TICKS,
+					ExternalTaskTask.MAX_TIME_LIMIT_TICKS);
+			assertFalse(broken.parse(null, "2"), "typing the \"2\" of 200");
+			assertFalse(broken.parse(null, "1"), "typing the \"1\" of 1200");
+			assertFalse(broken.parse(null, "5"), "typing the \"5\" of 500");
+		}
+
+		@Test
+		void aFloorOfOneLetsTheSameKeystrokesThrough() {
+			IntConfig field = new IntConfig(1, ExternalTaskTask.MAX_TIME_LIMIT_TICKS);
+			for (String typed : new String[]{"2", "20", "200", "1", "12", "120", "1200"}) {
+				assertTrue(field.parse(null, typed), "typing \"" + typed + "\" incrementally");
+			}
+		}
+
+		@Test
+		void anEmptyFieldIsStillAcceptedSoTheAuthorCanClearBeforeRetyping() {
+			IntConfig field = new IntConfig(1, ExternalTaskTask.MAX_TIME_LIMIT_TICKS);
+			assertTrue(field.parse(null, ""));
+		}
+
+		@Test
+		void theCeilingStillRefusesOvershootSoItCannotBeTypedPastADay() {
+			IntConfig field = new IntConfig(1, ExternalTaskTask.MAX_TIME_LIMIT_TICKS);
+			assertFalse(field.parse(null, "2000000"));
 		}
 	}
 }

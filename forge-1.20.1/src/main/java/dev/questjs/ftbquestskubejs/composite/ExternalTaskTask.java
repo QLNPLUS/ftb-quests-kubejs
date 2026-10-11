@@ -506,8 +506,15 @@ public final class ExternalTaskTask extends Task {
 	@OnlyIn(Dist.CLIENT)
 	public void fillConfigGroup(ConfigGroup config) {
 		super.fillConfigGroup(config);
+		// The floor here is 1, not MIN_TIME_LIMIT_TICKS, and that is not an oversight.
+		// FTB's text field validates every keystroke: TextBox.insertText only keeps the
+		// new text when IntConfig.parse accepts it, and parse rejects anything outside
+		// the range. With a floor of 20 the first digit typed into an emptied field is
+		// always below it — "2" for 200, "1" for 1200 — so the insert is refused, the
+		// buffer stays empty, and no number can be entered at all. The real floor is
+		// enforced by clampTicks on the way in, which is where it belongs.
 		config.addInt(TIME_LIMIT_TAG, timeLimitTicks, value -> timeLimitTicks = clampTicks(value),
-				DEFAULT_TIME_LIMIT_TICKS, MIN_TIME_LIMIT_TICKS, MAX_TIME_LIMIT_TICKS)
+				DEFAULT_TIME_LIMIT_TICKS, 1, MAX_TIME_LIMIT_TICKS)
 				.setNameKey("ftbquestskubejs.config.external_time_limit");
 
 		// One row that opens the reference editor, rather than one row per slot.
