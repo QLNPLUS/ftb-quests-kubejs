@@ -43,16 +43,20 @@ import java.util.UUID;
  *
  * <h2>The rule</h2>
  * <ol>
- *   <li>The player has not opened this quest yet → the task waits. Nothing is timed
- *       before an attempt exists, so setting up a world with the referenced quests
- *       already finished does not burn the window away.</li>
- *   <li>Inside an attempt, the first referenced quest completes → the clock starts,
- *       for {@link #getTimeLimitTicks()} game ticks (20 ticks = 1 second).</li>
+ *   <li>No referenced quest is complete yet → the task waits, no clock running.</li>
+ *   <li>The first poll that finds a referenced quest complete → the clock starts, for
+ *       {@link #getTimeLimitTicks()} game ticks (20 ticks = 1 second).</li>
  *   <li>All referenced quests are complete → this task completes.</li>
  *   <li>The clock runs out with some still missing → <b>every</b> referenced quest
  *       is reset, exactly like right-clicking it in the editor and choosing
  *       重置进度. The clock stops, so the attempt can be started again.</li>
  * </ol>
+ *
+ * <p>Step 2 is watched from the moment the quest is <i>unlockable</i>, not from the
+ * moment the player opens it. An earlier revision gated on {@code TeamData.isStarted}
+ * and that silently switched the whole type off: a quest is only ever marked started
+ * when the player opens it in the quest book, so an author testing from the editor saw
+ * neither a reset nor a completion, at any limit.
  *
  * <p>The clock runs on one timeline — the Overworld's game time — because game time
  * is per level, and an attempt that spans dimensions must not see a jump.
@@ -163,6 +167,14 @@ public final class ExternalTaskTask extends Task {
 	 */
 	private final Map<UUID, Long> startedAt = new HashMap<>();
 
+	/**
+	 * Records every state transition of the window. The type has no in-game feedback
+	 * of its own — a reset is silent, and a countdown is invisible — so this is the
+	 * only way an author can see why a challenge did or did not reset.
+	 */
+	private static final org.apache.logging.log4j.Logger LOGGER =
+			org.apache.logging.log4j.LogManager.getLogger("ftbquestskubejs.external_task");
+
 	public ExternalTaskTask(long id, Quest quest) {
 		super(id, quest);
 	}
@@ -185,16 +197,30 @@ public final class ExternalTaskTask extends Task {
 	public void readData(CompoundTag nbt) {
 		super.readData(nbt);
 		applyIds(nbt.getLongArray(REFERENCED_QUESTS_TAG));
-		if (nbt.contains(TIME_LIMIT_TAG, Tag.TAG_INT)) {
-			timeLimitTicks = clampTicks(nbt.getInt(TIME_LIMIT_TAG));
-		} else if (nbt.contains(LEGACY_SECONDS_TAG, Tag.TAG_INT)) {
-			timeLimitTicks = clampTicks(nbt.getInt(LEGACY_SECONDS_TAG) * 20);
-		} else if (nbt.contains(LEGACY_TIME_TAG, Tag.TAG_INT)) {
-			timeLimitTicks = clampTicks(nbt.getInt(LEGACY_TIME_TAG));
-		} else {
-			timeLimitTicks = DEFAULT_TIME_LIMIT_TICKS;
-		}
+		timeLimitTicks = resolveTimeLimitTicks(nbt);
 		startedAt.clear();
+	}
+
+	/**
+	 * The window in ticks, from whichever tag this save file happens to carry.
+	 *
+	 * <p>Three names have held this value across rewrites, and they are not all the
+	 * same unit, so the order matters: the current tag is ticks, the intermediate one
+	 * was seconds and has to be scaled, and the oldest was ticks again. A file
+	 * written by any of them loads unchanged rather than silently running twenty
+	 * times fast or slow.
+	 */
+	static int resolveTimeLimitTicks(CompoundTag nbt) {
+		if (nbt.contains(TIME_LIMIT_TAG, Tag.TAG_INT)) {
+			return clampTicks(nbt.getInt(TIME_LIMIT_TAG));
+		}
+		if (nbt.contains(LEGACY_SECONDS_TAG, Tag.TAG_INT)) {
+			return clampTicks(nbt.getInt(LEGACY_SECONDS_TAG) * 20L);
+		}
+		if (nbt.contains(LEGACY_TIME_TAG, Tag.TAG_INT)) {
+			return clampTicks(nbt.getInt(LEGACY_TIME_TAG));
+		}
+		return DEFAULT_TIME_LIMIT_TICKS;
 	}
 
 	@Override
@@ -260,8 +286,16 @@ public final class ExternalTaskTask extends Task {
 		return out;
 	}
 
-	private static int clampTicks(int value) {
-		return value < MIN_TIME_LIMIT_TICKS ? MIN_TIME_LIMIT_TICKS : Math.min(MAX_TIME_LIMIT_TICKS, value);
+	/**
+	 * Takes the value in ticks. It is a {@code long} so that scaling a seconds tag
+	 * cannot overflow into a negative number, which would clamp to the floor and hand
+	 * the author a one-second window they never asked for.
+	 */
+	private static int clampTicks(long value) {
+		if (value < MIN_TIME_LIMIT_TICKS) {
+			return MIN_TIME_LIMIT_TICKS;
+		}
+		return (int) Math.min(MAX_TIME_LIMIT_TICKS, value);
 	}
 
 	// ------------------------------------------------------------- evaluation
@@ -278,26 +312,11 @@ public final class ExternalTaskTask extends Task {
 		}
 
 		UUID team = teamData.getTeamId();
-
-		if (!teamData.isStarted(getQuest())) {
-			// The window belongs to an attempt, and an attempt begins when the player
-			// opens this quest. Polling runs as soon as the quest is merely unlockable,
-			// so without this gate the clock would start the moment any referenced
-			// quest happened to be complete — including while the author was still
-			// setting the world up — and the first look at the challenge would find it
-			// already expired.
-			startedAt.remove(team);
-			return;
-		}
-
+		// One timeline for the whole window. GameTime is per level, so measuring the
+		// start in the Overworld and a later poll in the Nether would make the player
+		// appear to have skipped years and reset the attempt on the spot.
+		long now = player.server.overworld().getGameTime();
 		List<Quest> referenced = references();
-		if (referenced.isEmpty()) {
-			// Nothing to chase, so nothing to time. An empty or fully dangling list
-			// leaves this task incomplete rather than completing on zero references.
-			startedAt.remove(team);
-			return;
-		}
-
 		Long start = startedAt.get(team);
 		int done = 0;
 		for (Quest quest : referenced) {
@@ -306,12 +325,19 @@ public final class ExternalTaskTask extends Task {
 			}
 		}
 
-		// One timeline for the whole window. GameTime is per level, so measuring the
-		// start in the Overworld and a later poll in the Nether would make the player
-		// appear to have skipped years and reset the attempt on the spot.
-		long now = player.server.overworld().getGameTime();
-		Action action = decide(done, referenced.size(), start == null,
-				start == null ? 0L : start, now, timeLimitTicks);
+		if (referenced.isEmpty()) {
+			// Nothing to chase, so nothing to time. An empty or fully dangling list
+			// leaves this task incomplete rather than completing on zero references.
+			startedAt.remove(team);
+			return;
+		}
+
+		Action action = decide(done, referenced.size(), start, now, timeLimitTicks);
+		if (action != Action.NONE) {
+			LOGGER.info("external_task {} action={} done={}/{} clock={} now={} limit={}",
+					getId(), action, done, referenced.size(),
+					start == null ? "stopped" : start, now, timeLimitTicks);
+		}
 
 		switch (action) {
 			case START -> startedAt.put(team, now);
@@ -342,29 +368,28 @@ public final class ExternalTaskTask extends Task {
 	}
 
 	/**
-	 * The state machine, as pure data so it can be tested without a level, a team
-	 * or a quest file.
+	 * The whole state machine, as pure data so it can be tested without a level, a
+	 * team or a quest file.
+	 *
+	 * <p>{@code startTick} is null when no countdown is running for this team. One
+	 * parameter carries both the flag and the value on purpose: an earlier version
+	 * took them separately, a call site inverted the flag, and every poll then read
+	 * as "clock running, started at tick 0" — which reset the attempt instantly and
+	 * made the window look ignored.
 	 *
 	 * <p>Success is checked before the deadline on purpose: if the last quest lands
 	 * on the same poll that the window expires on, the attempt counts. The deadline
 	 * bounds how late a completion may be noticed, not whether a completion that did
 	 * happen counts.
-	 *
-	 * @param done       how many references are currently complete
-	 * @param total      how many references resolve at all
-	 * @param running    whether a clock is already running
-	 * @param startTick  the tick that clock started on (ignored when not running)
-	 * @param now        the current game tick
-	 * @param limitTicks the window, in ticks
 	 */
-	public static Action decide(int done, int total, boolean running, long startTick, long now, long limitTicks) {
+	public static Action decide(int done, int total, Long startTick, long now, long limitTicks) {
 		if (total == 0) {
 			return Action.NONE;
 		}
 		if (done >= total) {
 			return Action.COMPLETE;
 		}
-		if (!running) {
+		if (startTick == null) {
 			return done == 0 ? Action.NONE : Action.START;
 		}
 		return now - startTick >= limitTicks ? Action.RESET : Action.NONE;
