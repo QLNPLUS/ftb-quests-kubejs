@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0 - 2026-10-11
+
+- Added the Composite Task quest type to NeoForge 1.21.1 and 26.1.2. It can reference other quests, complete when they are all finished within the time limit, and reset them if the limit expires.
+- Updated Composite Task descriptions on Forge 1.20.1, NeoForge 1.21.1, and NeoForge 26.1.2 to show numbered references without progress counts or time-limit text.
+
 ## 2.0.0 - 2026-10-10
 
 - New quest task type "Player Attributes": a task completes when the player's attributes (health, speed, attack damage, reach, luck, and any modded attribute) satisfy configured comparisons. Multiple conditions can be combined and all must match. The in-game editor offers greater than, greater/equal, less than, less/equal, equal, and inclusive range, with a searchable attribute list. The task shows an iron chestplate icon by default. Available on Forge 1.20.1, NeoForge 1.21.1, and NeoForge 26.1.2.

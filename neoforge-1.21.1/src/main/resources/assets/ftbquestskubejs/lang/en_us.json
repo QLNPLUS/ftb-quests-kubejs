@@ -4,7 +4,7 @@
   "ftbquests.task.ftbquestskubejs.external_task": "Composite Task",
   "ftbquests.task.ftbquestskubejs.external_task.count": "Composite Task (%s tasks)",
   "ftbquestskubejs.config.reference_none": "(none)",
-  "ftbquestskubejs.tooltip.referenced_quest": "Referenced quest: %s",
+  "ftbquestskubejs.tooltip.referenced_quest": "%1$s. %2$s",
   "ftbquestskubejs.config.data_path": "Data path (dot-separated; KubeJS data first, then PersistentData)",
   "ftbq_attribute_tasks.config.conditions": "Attribute requirements (all must match)",
   "ftbq_attribute_tasks.config.condition": "Attribute condition",
@@ -29,7 +29,5 @@
   "ftbquestskubejs.ui.reference_remove": "Click to remove this reference",
   "ftbquestskubejs.ui.reference_full": "At most %s tasks can be referenced",
   "ftbquestskubejs.ui.reference_id": "Task ID: %s",
-  "ftbquestskubejs.ui.reference_goals": "Goals: %s",
-  "ftbquestskubejs.tooltip.reference_progress": "References done: %1$s / %2$s",
-  "ftbquestskubejs.tooltip.time_limit": "Time limit: %s ticks"
+  "ftbquestskubejs.ui.reference_goals": "Goals: %s"
 }

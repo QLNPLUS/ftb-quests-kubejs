@@ -573,16 +573,10 @@ public final class ExternalTaskTask extends Task {
 	public void addMouseOverText(TooltipList list, TeamData teamData) {
 		super.addMouseOverText(list, teamData);
 		List<Quest> referenced = references();
-		int done = 0;
-		for (Quest quest : referenced) {
-			if (teamData.isCompleted(quest)) {
-				done++;
-			}
+		for (int i = 0; i < referenced.size(); i++) {
 			list.add(Component.translatable("ftbquestskubejs.tooltip.referenced_quest",
-					referenceLabel(quest)));
+					i + 1, referenceLabel(referenced.get(i))));
 		}
-		list.add(Component.translatable("ftbquestskubejs.tooltip.reference_progress", done, referenced.size()));
-		list.add(Component.translatable("ftbquestskubejs.tooltip.time_limit", timeLimitTicks));
 	}
 
 	/**

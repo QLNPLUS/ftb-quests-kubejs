@@ -1,6 +1,10 @@
 {
   "ftbquests.task.ftbq_attribute_tasks.attribute_check": "玩家属性",
   "ftbquests.task.ftbquestskubejs.custom_data_number": "自定义数据数值",
+  "ftbquests.task.ftbquestskubejs.external_task": "复合任务",
+  "ftbquests.task.ftbquestskubejs.external_task.count": "复合任务（%s 个任务）",
+  "ftbquestskubejs.config.reference_none": "（无）",
+  "ftbquestskubejs.tooltip.referenced_quest": "%1$s. %2$s",
   "ftbquestskubejs.config.data_path": "数据路径（点分隔；先查 KubeJS 持久数据，再查 PersistentData）",
   "ftbq_attribute_tasks.config.conditions": "属性条件（全部满足）",
   "ftbq_attribute_tasks.config.condition": "属性条件",
@@ -14,5 +18,16 @@
   "ftbq_attribute_tasks.operator.less_than": "小于",
   "ftbq_attribute_tasks.operator.less_than_or_equal": "小于等于",
   "ftbq_attribute_tasks.operator.equal": "等于",
-  "ftbq_attribute_tasks.operator.range": "范围（含端点）"
+  "ftbq_attribute_tasks.operator.range": "范围（含端点）",
+  "ftbquestskubejs.config.external_time_limit": "时限（tick，20 tick = 1 秒）：第一个引用任务完成时开始计时，超时未全部完成则重置全部引用任务",
+  "ftbquestskubejs.config.reference_list": "引用的任务",
+  "ftbquestskubejs.config.reference_count": "已引用 %s 个任务",
+  "ftbquestskubejs.config.reference_none_available": "没有可引用的任务：其余任务都已引用，或都不允许引用",
+  "ftbquestskubejs.ui.reference_editor_title": "引用的任务",
+  "ftbquestskubejs.ui.reference_pick_title": "选择要引用的任务",
+  "ftbquestskubejs.ui.reference_add": "＋ 新增引用",
+  "ftbquestskubejs.ui.reference_remove": "点击移除该引用",
+  "ftbquestskubejs.ui.reference_full": "最多只能引用 %s 个任务",
+  "ftbquestskubejs.ui.reference_id": "任务 ID：%s",
+  "ftbquestskubejs.ui.reference_goals": "目标数：%s"
 }

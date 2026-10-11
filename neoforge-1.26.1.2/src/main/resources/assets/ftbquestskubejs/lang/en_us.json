@@ -1,6 +1,10 @@
 {
   "ftbquests.task.ftbq_attribute_tasks.attribute_check": "Player Attributes",
   "ftbquests.task.ftbquestskubejs.custom_data_number": "Custom Data Number",
+  "ftbquests.task.ftbquestskubejs.external_task": "Composite Task",
+  "ftbquests.task.ftbquestskubejs.external_task.count": "Composite Task (%s tasks)",
+  "ftbquestskubejs.config.reference_none": "(none)",
+  "ftbquestskubejs.tooltip.referenced_quest": "%1$s. %2$s",
   "ftbquestskubejs.config.data_path": "Data path (dot-separated; KubeJS data first, then PersistentData)",
   "ftbq_attribute_tasks.config.conditions": "Attribute requirements (all must match)",
   "ftbq_attribute_tasks.config.condition": "Attribute condition",
@@ -14,5 +18,16 @@
   "ftbq_attribute_tasks.operator.less_than": "Less than",
   "ftbq_attribute_tasks.operator.less_than_or_equal": "Less than or equal to",
   "ftbq_attribute_tasks.operator.equal": "Equal to",
-  "ftbq_attribute_tasks.operator.range": "In inclusive range"
+  "ftbq_attribute_tasks.operator.range": "In inclusive range",
+  "ftbquestskubejs.config.external_time_limit": "Time limit (ticks, 20 = 1 second): the clock starts when the first referenced quest completes, and resets every referenced quest if they are not all done in time",
+  "ftbquestskubejs.config.reference_list": "Referenced tasks",
+  "ftbquestskubejs.config.reference_count": "%s tasks referenced",
+  "ftbquestskubejs.config.reference_none_available": "No quest is available to reference: the rest are referenced already, or not allowed",
+  "ftbquestskubejs.ui.reference_editor_title": "Referenced Tasks",
+  "ftbquestskubejs.ui.reference_pick_title": "Pick a task to reference",
+  "ftbquestskubejs.ui.reference_add": "+ Add reference",
+  "ftbquestskubejs.ui.reference_remove": "Click to remove this reference",
+  "ftbquestskubejs.ui.reference_full": "At most %s tasks can be referenced",
+  "ftbquestskubejs.ui.reference_id": "Task ID: %s",
+  "ftbquestskubejs.ui.reference_goals": "Goals: %s"
 }

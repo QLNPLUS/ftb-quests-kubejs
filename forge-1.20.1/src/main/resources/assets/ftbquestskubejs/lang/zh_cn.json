@@ -4,7 +4,7 @@
   "ftbquests.task.ftbquestskubejs.external_task": "复合任务",
   "ftbquests.task.ftbquestskubejs.external_task.count": "复合任务（%s 个任务）",
   "ftbquestskubejs.config.reference_none": "（无）",
-  "ftbquestskubejs.tooltip.referenced_quest": "引用的任务：%s",
+  "ftbquestskubejs.tooltip.referenced_quest": "%1$s. %2$s",
   "ftbquestskubejs.config.data_path": "数据路径（点分隔；先查 KubeJS 持久数据，再查 PersistentData）",
   "ftbq_attribute_tasks.config.conditions": "属性条件（全部满足）",
   "ftbq_attribute_tasks.config.condition": "属性条件",
@@ -29,7 +29,5 @@
   "ftbquestskubejs.ui.reference_remove": "点击移除该引用",
   "ftbquestskubejs.ui.reference_full": "最多只能引用 %s 个任务",
   "ftbquestskubejs.ui.reference_id": "任务 ID：%s",
-  "ftbquestskubejs.ui.reference_goals": "目标数：%s",
-  "ftbquestskubejs.tooltip.reference_progress": "引用任务完成：%1$s / %2$s",
-  "ftbquestskubejs.tooltip.time_limit": "时限：%s tick"
+  "ftbquestskubejs.ui.reference_goals": "目标数：%s"
 }
