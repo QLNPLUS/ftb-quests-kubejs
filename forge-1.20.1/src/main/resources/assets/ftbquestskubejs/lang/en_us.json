@@ -19,7 +19,7 @@
   "ftbq_attribute_tasks.operator.less_than_or_equal": "Less than or equal to",
   "ftbq_attribute_tasks.operator.equal": "Equal to",
   "ftbq_attribute_tasks.operator.range": "In inclusive range",
-  "ftbquestskubejs.config.external_time_limit": "Time limit (seconds): the clock starts when the first referenced quest completes; if the references are not all done when it runs out, every referenced quest is reset along with its goals and rewards",
+  "ftbquestskubejs.config.external_time_limit": "Time limit (ticks, 20 = 1 second): once the player has opened this quest, the clock starts when the first referenced quest completes; if the references are not all done when it runs out, every referenced quest is reset along with its goals and rewards",
   "ftbquestskubejs.config.reference_list": "Referenced tasks",
   "ftbquestskubejs.config.reference_count": "%s tasks referenced",
   "ftbquestskubejs.config.reference_none_available": "No quest is available to reference: the rest are referenced already, or not allowed",
@@ -31,5 +31,5 @@
   "ftbquestskubejs.ui.reference_id": "Task ID: %s",
   "ftbquestskubejs.ui.reference_goals": "Goals: %s",
   "ftbquestskubejs.tooltip.reference_progress": "References done: %1$s / %2$s",
-  "ftbquestskubejs.tooltip.time_limit": "Time limit: %s s"
+  "ftbquestskubejs.tooltip.time_limit": "Time limit: %s ticks"
 }

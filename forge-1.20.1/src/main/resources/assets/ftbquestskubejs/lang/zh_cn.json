@@ -19,7 +19,7 @@
   "ftbq_attribute_tasks.operator.less_than_or_equal": "小于等于",
   "ftbq_attribute_tasks.operator.equal": "等于",
   "ftbq_attribute_tasks.operator.range": "范围（含端点）",
-  "ftbquestskubejs.config.external_time_limit": "时限（秒）：第一个引用任务完成时开始计时；到时若引用任务没有全部完成，就重置全部引用任务（连同其目标与奖励）的进度",
+  "ftbquestskubejs.config.external_time_limit": "时限（tick，20 tick = 1 秒）：玩家打开本任务后，第一个引用任务完成时开始计时；到时若引用任务没有全部完成，就重置全部引用任务（连同其目标与奖励）的进度",
   "ftbquestskubejs.config.reference_list": "引用的任务",
   "ftbquestskubejs.config.reference_count": "已引用 %s 个任务",
   "ftbquestskubejs.config.reference_none_available": "没有可引用的任务：其余任务都已引用，或都不允许引用",
@@ -31,5 +31,5 @@
   "ftbquestskubejs.ui.reference_id": "任务 ID：%s",
   "ftbquestskubejs.ui.reference_goals": "目标数：%s",
   "ftbquestskubejs.tooltip.reference_progress": "引用任务完成：%1$s / %2$s",
-  "ftbquestskubejs.tooltip.time_limit": "时限：%s 秒"
+  "ftbquestskubejs.tooltip.time_limit": "时限：%s tick"
 }

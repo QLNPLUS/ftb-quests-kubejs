@@ -43,14 +43,19 @@ import java.util.UUID;
  *
  * <h2>The rule</h2>
  * <ol>
- *   <li>Nothing referenced is complete yet → the task waits, no clock running.</li>
- *   <li>The first referenced quest completes → the clock starts, for
- *       {@link #getTimeLimitSeconds()} seconds.</li>
+ *   <li>The player has not opened this quest yet → the task waits. Nothing is timed
+ *       before an attempt exists, so setting up a world with the referenced quests
+ *       already finished does not burn the window away.</li>
+ *   <li>Inside an attempt, the first referenced quest completes → the clock starts,
+ *       for {@link #getTimeLimitTicks()} game ticks (20 ticks = 1 second).</li>
  *   <li>All referenced quests are complete → this task completes.</li>
  *   <li>The clock runs out with some still missing → <b>every</b> referenced quest
  *       is reset, exactly like right-clicking it in the editor and choosing
  *       重置进度. The clock stops, so the attempt can be started again.</li>
  * </ol>
+ *
+ * <p>The clock runs on one timeline — the Overworld's game time — because game time
+ * is per level, and an attempt that spans dimensions must not see a jump.
  *
  * <p>Step 4 is what makes this more than {@code Quest.addDependency}: a dependency
  * only ever gates forward, while this type takes progress away from quests it does
@@ -113,8 +118,10 @@ public final class ExternalTaskTask extends Task {
 	public static final String TASK_NAMESPACE = "ftbquestskubejs";
 
 	private static final String REFERENCED_QUESTS_TAG = "referenced_quests";
-	private static final String TIME_LIMIT_TAG = "time_limit_seconds";
-	/** The pre-rewrite name for the same time field, which was stored in ticks. */
+	private static final String TIME_LIMIT_TAG = "time_limit_ticks";
+	/** The name this field had while it was stored in seconds. */
+	private static final String LEGACY_SECONDS_TAG = "time_limit_seconds";
+	/** The pre-rewrite name, which already stored ticks. */
 	private static final String LEGACY_TIME_TAG = "window_ticks";
 	// The pre-rewrite reference tag was "referenced_tasks" and held *task* ids. It is
 	// deliberately not read back: quest and task ids are both plain longs, so an old
@@ -127,10 +134,12 @@ public final class ExternalTaskTask extends Task {
 	 */
 	public static final int MAX_REFERENCES = 16;
 
-	public static final int DEFAULT_TIME_LIMIT_SECONDS = 60;
-	public static final int MIN_TIME_LIMIT_SECONDS = 1;
+	/** A minute. */
+	public static final int DEFAULT_TIME_LIMIT_TICKS = 1_200;
+	/** One second — anything shorter is not a challenge, it is a coin flip. */
+	public static final int MIN_TIME_LIMIT_TICKS = 20;
 	/** A day, so a challenge spanning several play sessions is expressible. */
-	public static final int MAX_TIME_LIMIT_SECONDS = 86_400;
+	public static final int MAX_TIME_LIMIT_TICKS = 1_728_000;
 
 	/**
 	 * Checked twice a second. The clock is compared against whole game ticks, so
@@ -146,7 +155,7 @@ public final class ExternalTaskTask extends Task {
 	);
 
 	private final List<Long> referencedQuestIds = new ArrayList<>();
-	private int timeLimitSeconds = DEFAULT_TIME_LIMIT_SECONDS;
+	private int timeLimitTicks = DEFAULT_TIME_LIMIT_TICKS;
 
 	/**
 	 * team → game tick the countdown started on. Server-side only, and only while
@@ -169,7 +178,7 @@ public final class ExternalTaskTask extends Task {
 	public void writeData(CompoundTag nbt) {
 		super.writeData(nbt);
 		nbt.putLongArray(REFERENCED_QUESTS_TAG, toLongArray());
-		nbt.putInt(TIME_LIMIT_TAG, timeLimitSeconds);
+		nbt.putInt(TIME_LIMIT_TAG, timeLimitTicks);
 	}
 
 	@Override
@@ -177,11 +186,13 @@ public final class ExternalTaskTask extends Task {
 		super.readData(nbt);
 		applyIds(nbt.getLongArray(REFERENCED_QUESTS_TAG));
 		if (nbt.contains(TIME_LIMIT_TAG, Tag.TAG_INT)) {
-			timeLimitSeconds = clampTime(nbt.getInt(TIME_LIMIT_TAG));
+			timeLimitTicks = clampTicks(nbt.getInt(TIME_LIMIT_TAG));
+		} else if (nbt.contains(LEGACY_SECONDS_TAG, Tag.TAG_INT)) {
+			timeLimitTicks = clampTicks(nbt.getInt(LEGACY_SECONDS_TAG) * 20);
 		} else if (nbt.contains(LEGACY_TIME_TAG, Tag.TAG_INT)) {
-			timeLimitSeconds = clampTime(Math.max(1, nbt.getInt(LEGACY_TIME_TAG) / 20));
+			timeLimitTicks = clampTicks(nbt.getInt(LEGACY_TIME_TAG));
 		} else {
-			timeLimitSeconds = DEFAULT_TIME_LIMIT_SECONDS;
+			timeLimitTicks = DEFAULT_TIME_LIMIT_TICKS;
 		}
 		startedAt.clear();
 	}
@@ -190,7 +201,7 @@ public final class ExternalTaskTask extends Task {
 	public void writeNetData(FriendlyByteBuf buffer) {
 		super.writeNetData(buffer);
 		buffer.writeLongArray(toLongArray());
-		buffer.writeVarInt(timeLimitSeconds);
+		buffer.writeVarInt(timeLimitTicks);
 	}
 
 	@Override
@@ -199,7 +210,7 @@ public final class ExternalTaskTask extends Task {
 		// The whole array is read before it is capped, so the rest of the packet
 		// payload stays aligned even if a peer sent more than MAX_REFERENCES.
 		applyIds(buffer.readLongArray());
-		timeLimitSeconds = clampTime(buffer.readVarInt());
+		timeLimitTicks = clampTicks(buffer.readVarInt());
 		startedAt.clear();
 	}
 
@@ -207,8 +218,8 @@ public final class ExternalTaskTask extends Task {
 		return Collections.unmodifiableList(referencedQuestIds);
 	}
 
-	public int getTimeLimitSeconds() {
-		return timeLimitSeconds;
+	public int getTimeLimitTicks() {
+		return timeLimitTicks;
 	}
 
 	/** The referenced quest at {@code index}, or null when the id is dangling. */
@@ -249,8 +260,8 @@ public final class ExternalTaskTask extends Task {
 		return out;
 	}
 
-	private static int clampTime(int value) {
-		return value < MIN_TIME_LIMIT_SECONDS ? MIN_TIME_LIMIT_SECONDS : Math.min(MAX_TIME_LIMIT_SECONDS, value);
+	private static int clampTicks(int value) {
+		return value < MIN_TIME_LIMIT_TICKS ? MIN_TIME_LIMIT_TICKS : Math.min(MAX_TIME_LIMIT_TICKS, value);
 	}
 
 	// ------------------------------------------------------------- evaluation
@@ -267,6 +278,18 @@ public final class ExternalTaskTask extends Task {
 		}
 
 		UUID team = teamData.getTeamId();
+
+		if (!teamData.isStarted(getQuest())) {
+			// The window belongs to an attempt, and an attempt begins when the player
+			// opens this quest. Polling runs as soon as the quest is merely unlockable,
+			// so without this gate the clock would start the moment any referenced
+			// quest happened to be complete — including while the author was still
+			// setting the world up — and the first look at the challenge would find it
+			// already expired.
+			startedAt.remove(team);
+			return;
+		}
+
 		List<Quest> referenced = references();
 		if (referenced.isEmpty()) {
 			// Nothing to chase, so nothing to time. An empty or fully dangling list
@@ -283,9 +306,12 @@ public final class ExternalTaskTask extends Task {
 			}
 		}
 
-		long now = player.level().getGameTime();
+		// One timeline for the whole window. GameTime is per level, so measuring the
+		// start in the Overworld and a later poll in the Nether would make the player
+		// appear to have skipped years and reset the attempt on the spot.
+		long now = player.server.overworld().getGameTime();
 		Action action = decide(done, referenced.size(), start == null,
-				start == null ? 0L : start, now, timeLimitSeconds * 20L);
+				start == null ? 0L : start, now, timeLimitTicks);
 
 		switch (action) {
 			case START -> startedAt.put(team, now);
@@ -455,8 +481,8 @@ public final class ExternalTaskTask extends Task {
 	@OnlyIn(Dist.CLIENT)
 	public void fillConfigGroup(ConfigGroup config) {
 		super.fillConfigGroup(config);
-		config.addInt(TIME_LIMIT_TAG, timeLimitSeconds, value -> timeLimitSeconds = clampTime(value),
-				DEFAULT_TIME_LIMIT_SECONDS, MIN_TIME_LIMIT_SECONDS, MAX_TIME_LIMIT_SECONDS)
+		config.addInt(TIME_LIMIT_TAG, timeLimitTicks, value -> timeLimitTicks = clampTicks(value),
+				DEFAULT_TIME_LIMIT_TICKS, MIN_TIME_LIMIT_TICKS, MAX_TIME_LIMIT_TICKS)
 				.setNameKey("ftbquestskubejs.config.external_time_limit");
 
 		// One row that opens the reference editor, rather than one row per slot.
@@ -524,7 +550,7 @@ public final class ExternalTaskTask extends Task {
 					referenceLabel(quest)));
 		}
 		list.add(Component.translatable("ftbquestskubejs.tooltip.reference_progress", done, referenced.size()));
-		list.add(Component.translatable("ftbquestskubejs.tooltip.time_limit", timeLimitSeconds));
+		list.add(Component.translatable("ftbquestskubejs.tooltip.time_limit", timeLimitTicks));
 	}
 
 	/**
