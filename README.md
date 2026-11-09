@@ -46,6 +46,18 @@ All events are client events. The event object exposes `player`, `chapterGroup`,
 
 `openQuest` represents the FTB Quests quest detail panel. It exposes the displayed `Quest`; an individual objective inside that panel is a `Task` and is not treated as a quest-detail open event.
 
+## Configuration
+
+The addon creates `config/ftbquestskubejs.json` on first launch:
+
+```json
+{
+  "debugLogging": false
+}
+```
+
+`debugLogging` is disabled by default. When it is `false`, the addon prints no debug messages and FTB Library's frequent `ft.external_task` INFO messages are muted. Set it to `true` to log every dispatched FTB Quests event and let those FTB Library messages through.
+
 ## Project Layout
 
 - `forge-1.19.2/`: Forge 1.19.2 project

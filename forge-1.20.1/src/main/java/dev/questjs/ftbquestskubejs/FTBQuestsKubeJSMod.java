@@ -8,6 +8,8 @@ import net.minecraftforge.fml.common.Mod;
 @Mod("ftbquestskubejs")
 public final class FTBQuestsKubeJSMod {
     public FTBQuestsKubeJSMod() {
+        QuestJSConfig.load();
+
         // Force task-type registration before quest files are loaded.
         AttributeTask.TYPE.getTypeId();
         CustomDataNumberTask.TYPE.getTypeId();

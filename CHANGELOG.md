@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.1 - 2026-11-09
+
+- Added `config/ftbquestskubejs.json` with a `debugLogging` switch, disabled by default. When disabled, FTB Library's `ft.external_task` INFO messages are muted.
+
 ## 2.1.0 - 2026-10-11
 
 - Added the Composite Task quest type to NeoForge 1.21.1 and 26.1.2. It can reference other quests, complete when they are all finished within the time limit, and reset them if the limit expires.

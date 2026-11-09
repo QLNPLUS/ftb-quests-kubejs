@@ -7,6 +7,17 @@ group = project.maven_group
 version = project.mod_version
 base.archivesName = project.archives_base_name
 
+loom {
+    runs {
+        client {
+            runDir = "runs/client"
+        }
+        server {
+            runDir = "runs/server"
+        }
+    }
+}
+
 repositories {
     mavenCentral()
     maven { url = "https://maven.fabricmc.net/" }
@@ -27,6 +38,7 @@ dependencies {
     modImplementation "curse.maven:ftb-quests-438496:8078537"
     modImplementation "curse.maven:kubejs-238086:8020594"
     modImplementation "curse.maven:rhino-416294:4944324"
+    modImplementation files("libs/energy-3.0.0.jar")
 }
 
 processResources {

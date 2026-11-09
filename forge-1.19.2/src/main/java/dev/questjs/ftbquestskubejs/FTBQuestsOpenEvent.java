@@ -28,6 +28,7 @@ public final class FTBQuestsOpenEvent extends ClientEventJS {
         this.task = task;
         this.openedObject = openedObject;
         this.closedObject = closedObject;
+        QuestJSLog.debug("Posting FTB Quests event: " + type);
     }
 
     public String getType() {

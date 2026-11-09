@@ -5,5 +5,6 @@ import net.minecraftforge.fml.common.Mod;
 @Mod("ftbquestskubejs")
 public final class FTBQuestsKubeJSMod {
     public FTBQuestsKubeJSMod() {
+        QuestJSConfig.load();
     }
 }
