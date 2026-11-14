@@ -7,7 +7,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 
 public final class QuestJSLog {
     private static final Logger LOGGER = LogManager.getLogger("ftbquestskubejs");
-    private static final String EXTERNAL_TASK_LOGGER = "ft.external_task";
+    private static final String EXTERNAL_TASK_LOGGER = "ftbquestskubejs.external_task";
 
     private QuestJSLog() {
     }

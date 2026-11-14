@@ -56,7 +56,9 @@ The addon creates `config/ftbquestskubejs.json` on first launch:
 }
 ```
 
-`debugLogging` is disabled by default. When it is `false`, the addon prints no debug messages and FTB Library's frequent `ft.external_task` INFO messages are muted. Set it to `true` to log every dispatched FTB Quests event and let those FTB Library messages through.
+`debugLogging` is disabled by default. When it is `false`, the addon prints no debug messages and the composite task's `ftbquestskubejs.external_task` INFO transitions (START / RESET / COMPLETE on every poll) are muted. Set it to `true` to log every dispatched FTB Quests event and let those composite-task transitions through.
+
+The logger is `ftbquestskubejs.external_task`, not `ft.external_task`: the level is applied to the name the task actually logs under, so muting works. If you already have a `log4j2.xml`, the same effect is available there with `<Logger name="ftbquestskubejs.external_task" level="WARN"/>`.
 
 ## Project Layout
 

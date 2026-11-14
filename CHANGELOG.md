@@ -1,8 +1,12 @@
 # Changelog
 
+## 2.1.2 - 2026-11-14
+
+- Fixed the `debugLogging` switch muting the wrong logger. The composite task logs under `ftbquestskubejs.external_task`, but the level was applied to `ft.external_task`, so the START / RESET lines kept printing with `debugLogging: false`. Both names now match.
+
 ## 2.1.1 - 2026-11-09
 
-- Added `config/ftbquestskubejs.json` with a `debugLogging` switch, disabled by default. When disabled, FTB Library's `ft.external_task` INFO messages are muted.
+- Added `config/ftbquestskubejs.json` with a `debugLogging` switch, disabled by default. When disabled, the composite task's `ftbquestskubejs.external_task` INFO transitions are muted.
 
 ## 2.1.0 - 2026-10-11
 
