@@ -1,6 +1,6 @@
 # FTB Quests KubeJS Events
 
-A client-side addon that exposes FTB Quests GUI state changes to KubeJS scripts.
+An addon that exposes FTB Quests GUI state changes to KubeJS scripts and adds three quest task types: Player Attributes, Custom Data Number, and Composite Task. The GUI events are client-side; the task types run on both sides, so this mod also belongs on a dedicated server.
 
 ## Supported Versions
 
@@ -46,6 +46,18 @@ All events are client events. The event object exposes `player`, `chapterGroup`,
 
 `openQuest` represents the FTB Quests quest detail panel. It exposes the displayed `Quest`; an individual objective inside that panel is a `Task` and is not treated as a quest-detail open event.
 
+## Quest Task Types
+
+All five targets offer the same three task types:
+
+| Task type ID | Name | Completes when |
+| --- | --- | --- |
+| `ftbq_attribute_tasks:attribute_check` | Player Attributes | every configured attribute condition matches the player |
+| `ftbquestskubejs:custom_data_number` | Custom Data Number | a numeric value in the player's persistent data matches the comparison |
+| `ftbquestskubejs:external_task` | Composite Task | all referenced quests are finished within the time limit, otherwise they are reset |
+
+See `CURSEFORGE_DESCRIPTION.md` for the full description of each type.
+
 ## Configuration
 
 The addon creates `config/ftbquestskubejs.json` on first launch:
@@ -83,7 +95,7 @@ The five projects use their own Gradle wrapper, Java toolchain, dependencies, ru
 
 ## CurseForge Publishing
 
-The workflow at `.github/workflows/curseforge-publish.yml` publishes all five loader/version builds when a GitHub Release is published. It also supports manual retries for `all`, `forge`, `fabric`, or `neoforge` from an explicit branch or tag.
+The workflow at `.github/workflows/curseforge-publish.yml` publishes all five loader/version builds when a GitHub Release is published. It also supports manual retries for `all`, `forge`, `fabric`, or `neoforge` from an explicit branch or tag. A `v2.2.0` release publishes only Forge 1.19.2 and Fabric 1.20.1 — the targets whose task types changed — and the same two targets can be retried by selecting the `2.2.0` target.
 
 Configure these repository settings before publishing:
 

@@ -3,13 +3,16 @@
   "id": "ftbquestskubejs",
   "version": "${version}",
   "name": "FTB Quests KubeJS Events",
-  "description": "Client-side KubeJS events for opening and closing FTB Quests chapter groups, chapters, and quest detail panels.",
+  "description": "KubeJS events for opening and closing FTB Quests chapter groups, chapters, and quest detail panels, plus the Player Attributes, Custom Data Number and Composite Task quest task types.",
   "authors": [
     "Questjs"
   ],
   "license": "MIT",
-  "environment": "client",
+  "environment": "*",
   "entrypoints": {
+    "main": [
+      "dev.questjs.ftbquestskubejs.FTBQuestsKubeJSFabric"
+    ],
     "client": [
       "dev.questjs.ftbquestskubejs.FTBQuestsKubeJSFabric"
     ]

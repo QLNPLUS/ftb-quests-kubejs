@@ -1,3 +1,7 @@
+param(
+    [string[]] $Projects
+)
+
 $ErrorActionPreference = "Stop"
 
 $root = Split-Path -Parent $PSScriptRoot
@@ -8,6 +12,13 @@ $targets = @(
     @{ Directory = "neoforge-1.21.1"; Java = "C:\Program Files\Java\jdk-21" },
     @{ Directory = "neoforge-1.26.1.2"; Java = "C:\Program Files\Java\jdk-25.0.4.1" }
 )
+
+if ($Projects) {
+    $targets = @($targets | Where-Object { $Projects -contains $_.Directory })
+    if ($targets.Count -eq 0) {
+        throw "No project matched -Projects: $($Projects -join ', ')"
+    }
+}
 
 $results = @()
 foreach ($target in $targets) {

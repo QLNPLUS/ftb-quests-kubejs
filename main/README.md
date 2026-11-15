@@ -6,10 +6,11 @@ This workspace contains version-specific addon projects for FTB Quests and KubeJ
 | --- | --- | --- | --- | --- |
 | `forge-1.19.2` | 1.19.2 | Forge | 1902.5.10-build.497 | 1902.6.2-build.73 |
 | `forge-1.20.1` | 1.20.1 | Forge | 2001.4.22 | 2001.6.5-build.26 |
+| `fabric-1.20.1` | 1.20.1 | Fabric | 2001.4.22 | 2001.6.5-build.26 |
 | `neoforge-1.21.1` | 1.21.1 | NeoForge | 2101.1.34 | 2101.7.2-build.374 |
 | `neoforge-1.26.1.2` | 26.1.2 | NeoForge | 26.1.2.7 | 26.1.2-8.0.4+neoforge |
 
-`main` is the workspace/documentation branch because it has no Minecraft version in its directory name. The four version directories are standalone Gradle projects.
+`main` is the workspace/documentation branch because it has no Minecraft version in its directory name. The five version directories are standalone Gradle projects.
 
 ## KubeJS API
 
@@ -55,6 +56,9 @@ From this directory:
 ./build-all.ps1
 ./validate-artifacts.ps1
 ./smoke-test.ps1
+
+# Only the projects that changed
+./smoke-test.ps1 -Projects forge-1.19.2, fabric-1.20.1
 ```
 
 The build also validates that every release JAR contains a valid root `pack.mcmeta`. The smoke script uses each loader's client run configuration, waits for the game log to reach a loading or startup marker, records the result, and stops only the Gradle process it started.

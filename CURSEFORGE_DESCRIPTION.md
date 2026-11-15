@@ -12,7 +12,7 @@ Everything is additive. The addon does not replace FTB Quests or KubeJS, and exi
 
 ## Quest Task Types
 
-Available on Forge 1.20.1, NeoForge 1.21.1, and NeoForge 26.1.2.
+Available on Forge 1.19.2, Forge 1.20.1, Fabric 1.20.1, NeoForge 1.21.1, and NeoForge 26.1.2.
 
 ### Player Attributes
 
@@ -40,13 +40,13 @@ A quest completes when a numeric value stored in the player's persistent data sa
 - **Data path** is dot-separated so nested values are reachable, for example `points` or `shop.balance`.
 - **Comparisons** are the same six as above, including inclusive range.
 - Values may be negative or fractional, and every numeric NBT tag type is read as a number, so you do not need to know which tag type the writer used.
-- The task checks the KubeJS persistent data store first, then the loader's own `PersistentData` store. If a path is missing, or the value is not a number, the task simply stays incomplete.
+- The task checks the KubeJS persistent data store first, then the loader's own `PersistentData` store on Forge and NeoForge. Fabric has no such store, so there the KubeJS store is the only source. If a path is missing, or the value is not a number, the task simply stays incomplete.
 
 To try it out, write a value and let the task read it back:
 
 ```
 # KubeJS store — command name differs by version
-/kubejs persistent_data merge entity @s {shop:{balance:50}}     # Forge 1.20.1
+/kubejs persistent_data merge entity @s {shop:{balance:50}}     # Forge 1.19.2, Forge 1.20.1, Fabric 1.20.1
 /kubejs persistent merge entity @s {shop:{balance:50}}          # NeoForge 1.21.1, NeoForge 26.1.2
 
 # Loader store
@@ -106,9 +106,9 @@ The event group is named `FTBQuestsKubeJSEvents` so it remains compatible with t
 
 | Minecraft | Loader | GUI events | Quest task types |
 | --- | --- | --- | --- |
-| 1.19.2 | Forge | Yes | No |
+| 1.19.2 | Forge | Yes | Yes |
 | 1.20.1 | Forge | Yes | Yes |
-| 1.20.1 | Fabric | Yes | No |
+| 1.20.1 | Fabric | Yes | Yes |
 | 1.21.1 | NeoForge | Yes | Yes |
 | 26.1.2 | NeoForge | Yes | Yes |
 

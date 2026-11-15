@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.0 - 2026-11-15
+
+- Ported the Player Attributes, Custom Data Number, and Composite Task quest task types to Forge 1.19.2 and Fabric 1.20.1. Every supported target now offers the same three task types; before this release those two builds shipped only the GUI events.
+- Fabric 1.20.1 now loads on dedicated servers: the task types have to exist on both sides, so the mod declares `main` and `client` entrypoints and is no longer marked client-only. The GUI event mixins stay client-only.
+- On Forge 1.19.2 the Composite Task's "list is full" and "nothing to reference" feedback uses the action bar, because FTB Library 1902 has no toast helper. Custom Data Number reads the KubeJS persistent data store only on Fabric, which has no Forge-style `PersistentData` compound.
+- On Forge 1.19.2, which has no task-sequence check, the polling guard falls back to FTB's `canStartTasks`, so a task still only ticks while its quest is startable.
+- This release republishes Forge 1.19.2 and Fabric 1.20.1 only. The other three projects are versioned 2.2.0 in the repository but are not re-uploaded, because their 2.1.2 files already contain these task types.
+
 ## 2.1.2 - 2026-11-14
 
 - Fixed the `debugLogging` switch muting the wrong logger. The composite task logs under `ftbquestskubejs.external_task`, but the level was applied to `ft.external_task`, so the START / RESET lines kept printing with `debugLogging: false`. Both names now match.

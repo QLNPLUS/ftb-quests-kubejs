@@ -1,0 +1,129 @@
+package dev.questjs.ftbquestskubejs.attribute;
+
+import dev.ftb.mods.ftblibrary.config.ConfigGroup;
+import dev.ftb.mods.ftblibrary.icon.ItemIcon;
+import dev.ftb.mods.ftbquests.quest.Quest;
+import dev.ftb.mods.ftbquests.quest.TeamData;
+import dev.ftb.mods.ftbquests.quest.task.Task;
+import dev.ftb.mods.ftbquests.quest.task.TaskType;
+import dev.ftb.mods.ftbquests.quest.task.TaskTypes;
+import dev.questjs.ftbquestskubejs.composite.ReevaluableTask;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.OptionalDouble;
+
+public final class AttributeTask extends Task implements ReevaluableTask {
+    /**
+     * Kept as the original standalone mod's namespace so quest files authored
+     * against More And More Quest load unchanged inside QuestJS.
+     */
+    public static final String TASK_NAMESPACE = "ftbq_attribute_tasks";
+
+    private static final String CONDITIONS_TAG = "conditions";
+
+    public static final TaskType TYPE = TaskTypes.register(
+            new ResourceLocation(TASK_NAMESPACE, "attribute_check"),
+            AttributeTask::new,
+            () -> ItemIcon.getItemIcon(Items.IRON_CHESTPLATE)
+    );
+
+    private final List<AttributeCondition> conditions = new ArrayList<>();
+
+    public AttributeTask(Quest quest) {
+        super(quest);
+    }
+
+    @Override
+    public TaskType getType() {
+        return TYPE;
+    }
+
+    @Override
+    public void readData(CompoundTag nbt) {
+        super.readData(nbt);
+        conditions.clear();
+        conditions.addAll(AttributeConditionCodec.readNbt(nbt.getList(CONDITIONS_TAG, Tag.TAG_COMPOUND)));
+    }
+
+    @Override
+    public void writeData(CompoundTag nbt) {
+        super.writeData(nbt);
+        nbt.put(CONDITIONS_TAG, AttributeConditionCodec.writeNbt(conditions));
+    }
+
+    @Override
+    public void readNetData(FriendlyByteBuf buffer) {
+        super.readNetData(buffer);
+        conditions.clear();
+        conditions.addAll(AttributeConditionCodec.readNetwork(buffer));
+    }
+
+    @Override
+    public void writeNetData(FriendlyByteBuf buffer) {
+        super.writeNetData(buffer);
+        AttributeConditionCodec.writeNetwork(buffer, conditions);
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void getConfig(ConfigGroup config) {
+        super.getConfig(config);
+        AttributeCondition defaultCondition = new AttributeCondition(
+                ForgeRegistries.ATTRIBUTES.getKey(Attributes.MAX_HEALTH).toString(),
+                ComparisonOperator.GREATER_THAN_OR_EQUAL,
+                20.0,
+                20.0
+        );
+        AttributeConditionConfig conditionType = new AttributeConditionConfig(
+                AttributeDropdownConfig.createNameMap()
+        );
+        config.addList("conditions", conditions, conditionType, defaultCondition)
+                .setNameKey("ftbq_attribute_tasks.config.conditions");
+    }
+
+    @Override
+    public int autoSubmitOnPlayerTick() {
+        return 20;
+    }
+
+    @Override
+    public void submitTask(TeamData teamData, ServerPlayer player, ItemStack craftedItem) {
+        if (teamData.isCompleted(this) || !teamData.canStartTasks(quest)) {
+            return;
+        }
+
+        if (isSatisfiedNow(teamData, player)) {
+            teamData.setProgress(this, 1L);
+        }
+    }
+
+    @Override
+    public boolean isSatisfiedNow(TeamData teamData, ServerPlayer player) {
+        return AttributeConditionEvaluator.allMatch(conditions, id -> readAttributeValue(player, id));
+    }
+
+    private static OptionalDouble readAttributeValue(ServerPlayer player, String attributeId) {
+        ResourceLocation id = ResourceLocation.tryParse(attributeId);
+        if (id == null || !ForgeRegistries.ATTRIBUTES.containsKey(id)) {
+            return OptionalDouble.empty();
+        }
+
+        Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(id);
+        AttributeInstance instance = player.getAttribute(attribute);
+        return instance == null ? OptionalDouble.empty() : OptionalDouble.of(instance.getValue());
+    }
+}

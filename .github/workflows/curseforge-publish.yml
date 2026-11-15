@@ -11,9 +11,9 @@ on:
         default: main
         type: string
       version:
-        description: CurseForge release version, for example 2.1.0
+        description: CurseForge release version, for example 2.2.0
         required: true
-        default: 2.1.0
+        default: 2.2.0
         type: string
       loader:
         description: Loader family when target is all
@@ -26,12 +26,12 @@ on:
           - fabric
           - neoforge
       target:
-        description: Publish 2.1.0 targets or retry one exact Minecraft target
+        description: Publish the 2.2.0 targets (Forge 1.19.2 and Fabric 1.20.1) or retry one exact Minecraft target
         required: true
-        default: 2.1.0
+        default: 2.2.0
         type: choice
         options:
-          - 2.1.0
+          - 2.2.0
           - forge-1.19.2
           - forge-1.20.1
           - fabric-1.20.1
@@ -51,7 +51,7 @@ env:
 
 jobs:
   publish-forge:
-    if: ${{ (github.event_name == 'release' && github.event.release.tag_name != 'v2.1.0' && github.event.release.tag_name != '2.1.0') || (github.event_name == 'workflow_dispatch' && inputs.target == 'all' && (inputs.loader == 'all' || inputs.loader == 'forge')) }}
+    if: ${{ (github.event_name == 'release' && github.event.release.tag_name != 'v2.1.0' && github.event.release.tag_name != '2.1.0' && github.event.release.tag_name != 'v2.2.0' && github.event.release.tag_name != '2.2.0') || (github.event_name == 'workflow_dispatch' && inputs.target == 'all' && (inputs.loader == 'all' || inputs.loader == 'forge')) }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -140,7 +140,7 @@ jobs:
           java: ${{ matrix.java }}
 
   publish-neoforge:
-    if: ${{ (github.event_name == 'release' && github.event.release.tag_name != 'v2.1.0' && github.event.release.tag_name != '2.1.0') || (github.event_name == 'workflow_dispatch' && inputs.target == 'all' && (inputs.loader == 'all' || inputs.loader == 'neoforge')) }}
+    if: ${{ (github.event_name == 'release' && github.event.release.tag_name != 'v2.1.0' && github.event.release.tag_name != '2.1.0' && github.event.release.tag_name != 'v2.2.0' && github.event.release.tag_name != '2.2.0') || (github.event_name == 'workflow_dispatch' && inputs.target == 'all' && (inputs.loader == 'all' || inputs.loader == 'neoforge')) }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -229,7 +229,7 @@ jobs:
           java: ${{ matrix.java }}
 
   publish-fabric:
-    if: ${{ (github.event_name == 'release' && github.event.release.tag_name != 'v2.1.0' && github.event.release.tag_name != '2.1.0') || (github.event_name == 'workflow_dispatch' && inputs.target == 'all' && (inputs.loader == 'all' || inputs.loader == 'fabric')) }}
+    if: ${{ (github.event_name == 'release' && github.event.release.tag_name != 'v2.1.0' && github.event.release.tag_name != '2.1.0' && github.event.release.tag_name != 'v2.2.0' && github.event.release.tag_name != '2.2.0') || (github.event_name == 'workflow_dispatch' && inputs.target == 'all' && (inputs.loader == 'all' || inputs.loader == 'fabric')) }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -313,7 +313,7 @@ jobs:
           java: ${{ matrix.java }}
 
   prepare-selected-targets:
-    if: ${{ (github.event_name == 'release' && (github.event.release.tag_name == 'v2.1.0' || github.event.release.tag_name == '2.1.0')) || (github.event_name == 'workflow_dispatch' && inputs.target != 'all') }}
+    if: ${{ (github.event_name == 'release' && (github.event.release.tag_name == 'v2.2.0' || github.event.release.tag_name == '2.2.0')) || (github.event_name == 'workflow_dispatch' && inputs.target != 'all') }}
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.select.outputs.matrix }}
@@ -324,13 +324,13 @@ jobs:
           INPUT_TARGET: ${{ inputs.target }}
         run: |
           if [ "$EVENT_NAME" = "release" ]; then
-            target="2.1.0"
+            target="2.2.0"
           else
             target="$INPUT_TARGET"
           fi
           case "$target" in
-            2.1.0)
-              matrix='{"include":[{"directory":"forge-1.20.1","loader":"forge","minecraft":"1.20.1","java":"17"},{"directory":"neoforge-1.21.1","loader":"neoforge","minecraft":"1.21.1","java":"21"},{"directory":"neoforge-1.26.1.2","loader":"neoforge","minecraft":"26.1.2","java":"25"}]}'
+            2.2.0)
+              matrix='{"include":[{"directory":"forge-1.19.2","loader":"forge","minecraft":"1.19.2","java":"17"},{"directory":"fabric-1.20.1","loader":"fabric","minecraft":"1.20.1","java":"17"}]}'
               ;;
             forge-1.19.2)
               matrix='{"include":[{"directory":"forge-1.19.2","loader":"forge","minecraft":"1.19.2","java":"17"}]}'
